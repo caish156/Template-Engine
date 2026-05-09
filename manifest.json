@@ -1,0 +1,28 @@
+{
+  "id": "template.engine.plugin",
+  "name": "Template Engine",
+  "version": "1.0.0",
+  "manifestVersion": 4,
+  "apiVersion": 2,
+  "main": "index.html",
+
+  "host": {
+    "app": "PS",
+    "minVersion": "22.0.0"
+  },
+
+  "entrypoints": [
+    {
+      "type": "panel",
+      "id": "templateEnginePanel",
+      "label": {
+        "default": "Template Engine"
+      },
+
+      "minimumSize": {
+        "width": 300,
+        "height": 600
+      }
+    }
+  ]
+}

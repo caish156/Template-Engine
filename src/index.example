@@ -1,0 +1,7 @@
+// const { loadFolder } = require("./functions/loadFolder");
+
+// const { fillFrame } = require("./functions/fillFrame");
+
+// document.getElementById("loadFolderBtn").onclick = loadFolder;
+
+// document.getElementById("fillBtn").onclick = fillFrame;
