@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier . --write",
-    "build": "webpack"
+    "build": "webpack "
   },
   "keywords": [],
   "author": "",
@@ -21,7 +21,9 @@
     "@babel/preset-env": "^7.29.5",
     "@babel/preset-react": "^7.28.5",
     "babel-loader": "^10.1.1",
+    "css-loader": "^7.1.4",
     "html-webpack-plugin": "^5.6.7",
+    "mini-css-extract-plugin": "^2.10.2",
     "prettier": "^3.8.3",
     "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2",

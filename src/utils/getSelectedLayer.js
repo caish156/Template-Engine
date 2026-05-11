@@ -1,4 +1,4 @@
-const photoshop = require("photoshop");
+const photoshop = window.require("photoshop");
 
 async function getSelectedLayer(doc) {
   const layer = doc.activeLayers[0];
@@ -6,23 +6,6 @@ async function getSelectedLayer(doc) {
   if (!layer) {
     throw new Error("Select frame layer");
   }
-
-  // HIDE OVERLAYS / EFFECTS
-
-  // await photoshop.action.batchPlay(
-  //   [
-  //     {
-  //       _obj: "disableLayerFX",
-  //       _target: [
-  //         {
-  //           _ref: "layer",
-  //           _id: layer.id,
-  //         },
-  //       ],
-  //     },
-  //   ],
-  //   {},
-  // );
 
   return layer;
 }

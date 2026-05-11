@@ -1,6 +1,4 @@
-// functions/images.js
-
-const { app } = require("photoshop");
+const { app } = window.require("photoshop");
 
 let usedImages = [];
 
