@@ -2,7 +2,7 @@ const React = require("react");
 
 const { openDialog } = require("./openDialog");
 
-const TemplateResultsView = require("./TemplateResultsView");
+const TemplateResultsView = require("./TemplateResultsView.jsx");
 
 const { store } = require("../store/store");
 
@@ -10,24 +10,24 @@ function SearchBar() {
   const [search, setSearch] = React.useState("");
 
   async function handleSearch() {
-    if (!search.trim()) return;
-
-    // DROPDOWN VALUE FROM STORE
-
     const type = store.searchType;
+    console.log(search, type, search.trim());
+    if (!search.trim()) return;
 
     // =====================
     // TEMPLATE SEARCH
     // =====================
 
     if (type === "template") {
-      const parts = search.trim().split(" ");
+      const parts = search.trim().toLowerCase().split(/\s+/);
 
       const v = parts[0] || 0;
 
       const h = parts[1] || 0;
 
       const searchKey = `${v}v${h}h`;
+
+      console.log(searchKey, store.settings.templatePath);
 
       openDialog({
         type: "templates",
@@ -52,7 +52,8 @@ function SearchBar() {
   }
 
   function handleKeyDown(event) {
-    if (event.key === "Enter") {
+    console.log(event.key);
+    if (event.key == "Enter") {
       handleSearch();
     }
   }

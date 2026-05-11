@@ -1,8 +1,11 @@
 // utils/settings.js
 
 const uxp = window.require("uxp");
+
 const fs = uxp.storage.localFileSystem;
+
 const { formats } = uxp.storage;
+
 const { store } = require("../store/store");
 
 // ======================
@@ -10,12 +13,13 @@ const { store } = require("../store/store");
 // ======================
 
 const defaultSettings = {
-  templatePath: "",
-  clipartPath: "",
+  templateFolder: "",
+
+  clipartFolder: "",
 };
 
 // ======================
-// GET DATA FOLDER FILE
+// GET SETTINGS FILE
 // ======================
 
 async function getSettingsFile() {
@@ -38,15 +42,16 @@ async function saveSettings() {
   const file = await getSettingsFile();
 
   const settingsData = {
-    templatePath: store.settings.templatePath,
-    clipartPath: store.settings.clipartPath,
+    templateFolder: store.settings.templateFolder,
+
+    clipartFolder: store.settings.clipartFolder,
   };
 
   await file.write(JSON.stringify(settingsData, null, 2), {
     format: formats.utf8,
   });
 
-  console.log("Settings Saved");
+  console.log("SETTINGS SAVED");
 }
 
 // ======================
@@ -73,12 +78,49 @@ async function loadSettings() {
 
     store.settings = {
       ...defaultSettings,
+
       ...settings,
     };
 
-    console.log("Settings Loaded:", store.settings);
+    // ======================
+    // RESTORE TEMPLATE
+    // ======================
+
+    if (store.settings.templateFolder) {
+      try {
+        const folder = await fs.getEntryForPersistentToken(
+          store.settings.templateFolder,
+        );
+
+        store.templateFolder = folder;
+
+        console.log("TEMPLATE RESTORED:", folder.nativePath);
+      } catch (error) {
+        console.log("TEMPLATE RESTORE FAILED");
+      }
+    }
+
+    // ======================
+    // RESTORE CLIPART
+    // ======================
+
+    if (store.settings.clipartFolder) {
+      try {
+        const folder = await fs.getEntryForPersistentToken(
+          store.settings.clipartFolder,
+        );
+
+        store.clipartFolder = folder;
+
+        console.log("CLIPART RESTORED:", folder.nativePath);
+      } catch (error) {
+        console.log("CLIPART RESTORE FAILED");
+      }
+    }
+
+    console.log("SETTINGS LOADED:", store.settings);
   } catch (error) {
-    console.log("Settings Load Error", error);
+    console.log("SETTINGS LOAD ERROR", error);
 
     store.settings = {
       ...defaultSettings,
@@ -87,21 +129,37 @@ async function loadSettings() {
 }
 
 // ======================
-// TEMPLATE PATH
+// TEMPLATE
 // ======================
 
-async function setTemplatePath(path) {
-  store.settings.templatePath = path;
+async function setTemplatePath(folder) {
+  const token = await fs.createPersistentToken(folder);
+
+  // RUNTIME OBJECT
+
+  store.templateFolder = folder;
+
+  // SAVE TOKEN
+
+  store.settings.templateFolder = token;
 
   await saveSettings();
 }
 
 // ======================
-// CLIPART PATH
+// CLIPART
 // ======================
 
-async function setClipartPath(path) {
-  store.settings.clipartPath = path;
+async function setClipartPath(folder) {
+  const token = await fs.createPersistentToken(folder);
+
+  // RUNTIME OBJECT
+
+  store.clipartFolder = folder;
+
+  // SAVE TOKEN
+
+  store.settings.clipartFolder = token;
 
   await saveSettings();
 }

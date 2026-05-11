@@ -5,7 +5,7 @@ const { showImages } = require("./utils/showImages");
 const { startLayerListener } = require("./utils/startLayerListener");
 const { openSettingsDialog } = require("./utils/openSettingsDialog");
 const { store } = require("./store/store");
-const { SearchBar } = require("./components/SearchBar");
+const SearchBar = require("./components/SearchBar");
 
 function App() {
   React.useEffect(() => {

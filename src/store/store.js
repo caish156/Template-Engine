@@ -10,13 +10,25 @@ const store = {
   fillMode: false,
 
   overlayVisible: false,
-  fillMode: false,
+
   listenerStarted: false,
+
   lastLayerId: null,
+
+  searchType: "template",
+
+  // RUNTIME FOLDER OBJECTS
+
+  templateFolder: null,
+
+  clipartFolder: null,
+
+  // PERSISTENT TOKENS
+
   settings: {
-    templatePath: "",
-    clipartPath: "",
-    searchType: "template",
+    templateFolder: "",
+
+    clipartFolder: "",
   },
 };
 

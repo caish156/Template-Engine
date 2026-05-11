@@ -14,7 +14,7 @@ function SettingsView() {
 
     if (!folder) return;
 
-    await setTemplatePath(folder.nativePath);
+    await setTemplatePath(folder);
 
     console.log("Template Folder:", folder.nativePath);
   }
@@ -24,7 +24,7 @@ function SettingsView() {
 
     if (!folder) return;
 
-    await setClipartPath(folder.nativePath);
+    await setClipartPath(folder);
 
     console.log("Clipart Folder:", folder.nativePath);
   }
@@ -75,7 +75,7 @@ function SettingsView() {
             textOverflow: "ellipsis",
           }}
         >
-          {store.settings.templatePath || "Browse"}
+          {store.templateFolder?.nativePath || "Browse"}
         </button>
       </div>
 
@@ -109,7 +109,7 @@ function SettingsView() {
             textOverflow: "ellipsis",
           }}
         >
-          {store.settings.clipartPath || "Browse"}
+          {store.clipartFolder?.nativePath || "Browse"}
         </button>
       </div>
 
