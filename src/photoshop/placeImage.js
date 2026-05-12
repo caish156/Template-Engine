@@ -25,7 +25,7 @@ async function placeImage(
   try {
     await core.executeAsModal(
       async () => {
-        // PSD
+        // MAIN PSD
 
         const psdDoc =
           getActivePSD();
@@ -86,35 +86,32 @@ async function placeImage(
             frameBottom) /
           2;
 
-        // TOKEN
+        // OPEN IMAGE
 
-        const token =
-          await fs.createSessionToken(
-            file
-          );
+        const imageDoc =
+          await app.open(file);
 
-        // PLACE
+        // IMAGE LAYER
 
-        await action.batchPlay(
-          [
-            {
-              _obj:
-                "placeEvent",
+        const imageLayer =
+          imageDoc.activeLayers[0];
 
-              null: {
-                _path: token,
+        // DUPLICATE INTO PSD
 
-                _kind:
-                  "local",
-              },
-            },
-          ],
-          {
-            synchronousExecution: true,
-          }
+        await imageLayer.duplicate(
+          psdDoc
         );
 
-        // PLACED LAYER
+        // CLOSE IMAGE DOC
+
+        await imageDoc.closeWithoutSaving();
+
+        // BACK TO PSD
+
+        app.activeDocument =
+          psdDoc;
+
+        // DUPLICATED LAYER
 
         const placedLayer =
           psdDoc.activeLayers[0];
@@ -164,37 +161,29 @@ async function placeImage(
             scaleY
           );
 
-        // FINAL SIZE AFTER SCALE
+        // IMAGE CENTER
 
-        const finalWidth =
-          imageWidth * scale;
-
-        const finalHeight =
-          imageHeight * scale;
-
-        // CURRENT CENTER
-
-        const currentCenterX =
+        const imageCenterX =
           (imageLeft +
             imageRight) /
           2;
 
-        const currentCenterY =
+        const imageCenterY =
           (imageTop +
             imageBottom) /
           2;
 
-        // FINAL POSITION
+        // MOVE
 
         const moveX =
           frameCenterX -
-          currentCenterX;
+          imageCenterX;
 
         const moveY =
           frameCenterY -
-          currentCenterY;
+          imageCenterY;
 
-        // SINGLE FINAL BATCH
+        // FINAL OPERATIONS
 
         await action.batchPlay(
           [
@@ -285,26 +274,6 @@ async function placeImage(
                       moveY,
                   },
               },
-            },
-
-            // RASTERIZE
-
-            {
-              _obj:
-                "rasterizeLayer",
-
-              _target: [
-                {
-                  _ref:
-                    "layer",
-
-                  _enum:
-                    "ordinal",
-
-                  _value:
-                    "targetEnum",
-                },
-              ],
             },
 
             // CLIP

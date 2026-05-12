@@ -1,6 +1,3 @@
-const uxp =
-  window.require("uxp");
-
 async function showImages(
   images
 ) {
@@ -8,36 +5,8 @@ async function showImages(
 
   for (const file of images) {
     try {
-      // RAW READ
-
-      const data =
-        await file.read({
-          format:
-            uxp.storage
-              .formats.binary,
-        });
-
-      // BLOB
-
-      const blob =
-        new Blob([data], {
-          type:
-            "image/jpeg",
-        });
-
-      // URL
-
-      const url =
-        URL.createObjectURL(
-          blob
-        );
-
       imageData.push({
         file,
-
-        blob,
-
-        url,
 
         path:
           file.nativePath,

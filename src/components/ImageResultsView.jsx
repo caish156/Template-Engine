@@ -15,9 +15,8 @@ const containerStyle = {
 };
 
 const cardStyle = {
-  width: "78px",
-
-  height: "78px",
+  // width: "78px",
+  // height: "78px",
 };
 
 const buttonStyle = {
@@ -25,9 +24,9 @@ const buttonStyle = {
 
   border: "none",
 
-  width: "70px",
+  // width: "70px",
 
-  height: "70px",
+  // height: "70px",
 
   background: "transparent",
 
@@ -35,53 +34,29 @@ const buttonStyle = {
 };
 
 const imageStyle = {
-  width: "70px",
-
-  height: "70px",
-
-  objectFit: "cover",
+  // width: "70px",
+  // height: "70px",
+  // objectFit: "cover",
 };
 
-function ImageResultsView({
-  images,
-  onImageClick,
-}) {
+function ImageResultsView({ images, onImageClick }) {
   return (
     <div style={containerStyle}>
-      {images.map(
-        (item, index) => {
-          return (
-            <div
-              key={index}
-              style={cardStyle}
-            >
-              <button
-                onClick={() =>
-                  onImageClick(
-                    item
-                  )
-                }
-                style={buttonStyle}
-              >
-                <img
-                  src={item.url}
-                  style={{
-                    ...imageStyle,
-
-                    opacity:
-                      item.used
-                        ? 0.3
-                        : 1,
-                  }}
-                />
-              </button>
-            </div>
-          );
-        }
-      )}
+      {images.map((item, index) => {
+        return (
+          <div key={index} style={cardStyle}>
+            <button onClick={() => onImageClick(item)} style={buttonStyle}>
+              <img
+                src={`file://${image.path}`}
+                loading="lazy"
+                style={{ width: "100%", height: "100%", object_fit: "cover" }}
+              />
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-module.exports =
-  ImageResultsView;
+module.exports = ImageResultsView;

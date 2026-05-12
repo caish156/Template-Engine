@@ -27,8 +27,6 @@ function App() {
       );
     });
 
-    console.log(imageFiles, "imagefiles");
-
     const thumbnails = await showImages(imageFiles);
 
     // GLOBAL STORE
