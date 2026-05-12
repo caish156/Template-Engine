@@ -59,7 +59,7 @@ function SearchBar() {
   }
 
   return (
-    <div className="searchBox">
+    <div className="allRow">
       <input
         type="text"
         placeholder="Search..."
@@ -70,7 +70,9 @@ function SearchBar() {
         onKeyDown={handleKeyDown}
       />
 
-      <button className="searchBtn" onClick={handleSearch}></button>
+      <button className="searchBtn" onClick={handleSearch}>
+        S
+      </button>
     </div>
   );
 }

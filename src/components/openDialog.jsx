@@ -1,46 +1,106 @@
-// components/openDialog.jsx
-
 const React = require("react");
 
-const ReactDOM = require("react-dom/client");
+const ReactDOM = require(
+  "react-dom/client"
+);
 
-function openDialog({ type, width, height, component }) {
-  let dialog = document.getElementById("imageOverlay");
+let dialog = null;
 
+let root = null;
+
+let rootNode = null;
+
+function openDialog({
+  width,
+  height,
+  component,
+}) {
   // CREATE ONCE
 
   if (!dialog) {
-    dialog = document.createElement("dialog");
+    dialog =
+      document.createElement(
+        "dialog"
+      );
 
     dialog.id = "imageOverlay";
-    dialog.style.padding = "20px";
-    dialog.style.border = "1px solid #444";
-    dialog.style.background = "#252525";
-    dialog.style.color = "white";
-    dialog.style.overflow = "auto";
-    document.body.appendChild(dialog);
+
+    dialog.style.padding =
+      "20px";
+
+    dialog.style.border =
+      "1px solid #444";
+
+    dialog.style.background =
+      "#252525";
+
+    dialog.style.color =
+      "white";
+
+    dialog.style.overflow =
+      "auto";
+
+    document.body.appendChild(
+      dialog
+    );
+
+    // ROOT NODE
+
+    rootNode =
+      document.createElement(
+        "div"
+      );
+
+    dialog.appendChild(
+      rootNode
+    );
+
+    // ROOT
+
+    root =
+      ReactDOM.createRoot(
+        rootNode
+      );
+
+    // CLEANUP ON CLOSE
+
+    dialog.addEventListener(
+  "close",
+  () => {
+    try {
+      // CLEAR REACT
+
+      root.render(null);
+
+      // RELEASE IMAGE URLS
+
+      if (
+        window.store &&
+        window.store.images
+      ) {
+        for (const item of window
+          .store.images) {
+          try {
+            URL.revokeObjectURL(
+              item.url
+            );
+          } catch (e) {}
+        }
+      }
+    } catch (e) {}
+  }
+);
   }
 
   // SIZE
 
-  dialog.style.width = width || "900px";
+  dialog.style.width =
+    width || "900px";
 
-  dialog.style.height = height || "700px";
+  dialog.style.height =
+    height || "700px";
 
-  // CLEAR
-
-  dialog.innerHTML = "";
-
-  // ROOT
-
-  const rootElement = document.createElement("div");
-  rootElement.style.width = "100%";
-  rootElement.style.height = "100%";
-  dialog.appendChild(rootElement);
-
-  // REACT RENDER
-
-  const root = ReactDOM.createRoot(rootElement);
+  // RENDER
 
   root.render(component);
 

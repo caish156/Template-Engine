@@ -1,27 +1,55 @@
-// utils/showImages.js
+const uxp =
+  window.require("uxp");
 
-const uxp = window.require("uxp");
-
-async function showImages(images) {
+async function showImages(
+  images
+) {
   const imageData = [];
 
   for (const file of images) {
-    const data = await file.read({
-      format: uxp.storage.formats.binary,
-    });
+    try {
+      // RAW READ
 
-    const blob = new Blob([data], {
-      type: "image/jpeg",
-    });
+      const data =
+        await file.read({
+          format:
+            uxp.storage
+              .formats.binary,
+        });
 
-    const url = URL.createObjectURL(blob);
+      // BLOB
 
-    imageData.push({
-      file,
-      url,
-      path: file.nativePath,
-      used: false,
-    });
+      const blob =
+        new Blob([data], {
+          type:
+            "image/jpeg",
+        });
+
+      // URL
+
+      const url =
+        URL.createObjectURL(
+          blob
+        );
+
+      imageData.push({
+        file,
+
+        blob,
+
+        url,
+
+        path:
+          file.nativePath,
+
+        used: false,
+      });
+    } catch (error) {
+      console.log(
+        "IMAGE LOAD ERROR:",
+        file.name
+      );
+    }
   }
 
   return imageData;

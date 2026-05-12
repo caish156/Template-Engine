@@ -11,6 +11,9 @@ function App() {
   React.useEffect(() => {
     startLayerListener();
   }, []);
+
+  const [fillMode, setFillMode] = React.useState(false);
+  window.store = store;
   const openFolder = async () => {
     const folder = await uxp.storage.localFileSystem.getFolder();
 
@@ -68,11 +71,17 @@ function App() {
       </div>
 
       <SearchBar />
+
       <div className="allRow">
         <button
-          className={`mainButton ${store.fillMode ? "active" : ""}`}
+          className={`mainButton ${fillMode ? "active" : ""}`}
           onClick={() => {
-            store.fillMode = !store.fillMode;
+            console.log(fillMode);
+            const value = !fillMode;
+
+            setFillMode(value);
+
+            store.fillMode = value;
           }}
         >
           Fill

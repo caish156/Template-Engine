@@ -16,7 +16,7 @@ const store = {
   lastLayerId: null,
 
   searchType: "template",
-
+imageOverlayComponent: null,
   // RUNTIME FOLDER OBJECTS
 
   templateFolder: null,

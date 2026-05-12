@@ -1,18 +1,72 @@
 // photoshop/startLayerListener.js
 
-const photoshop = window.require("photoshop");
+const React = require("react");
 
-const action = photoshop.action;
+const photoshop =
+  window.require("photoshop");
+
+const action =
+  photoshop.action;
 
 const app = photoshop.app;
 
-const { store } = require("../store/store");
+const { store } = require(
+  "../store/store"
+);
 
-const { openDialog } = require("../components/openDialog");
+const { openDialog } = require(
+  "../components/openDialog"
+);
 
-const { placeImage } = require("../photoshop/placeImage");
+const ImageResultsView = require(
+  "../components/ImageResultsView.jsx"
+);
+
+const { placeImage } = require(
+  "../photoshop/placeImage"
+);
+
+// ======================
+// PROCESS LOCK
+// ======================
+
+let isProcessing = false;
+
+// ======================
+// IMAGE CLICK
+// ======================
+
+async function handleImageClick(
+  item
+) {
+  try {
+    const overlay =
+      document.getElementById(
+        "imageOverlay"
+      );
+
+    if (overlay) {
+      overlay.close();
+    }
+
+    await placeImage(item.file);
+
+    item.used = true;
+  } catch (error) {
+    console.log(
+      "PLACE IMAGE ERROR:",
+      error
+    );
+  }
+}
+
+// ======================
+// LISTENER
+// ======================
 
 function startLayerListener() {
+  // ALREADY STARTED
+
   if (store.listenerStarted) {
     return;
   }
@@ -25,6 +79,14 @@ function startLayerListener() {
     ["select"],
 
     async () => {
+      // PREVENT EVENT SPAM
+
+      if (isProcessing) {
+        return;
+      }
+
+      isProcessing = true;
+
       try {
         // FILL MODE OFF
 
@@ -38,7 +100,12 @@ function startLayerListener() {
           return;
         }
 
-        const dialog = document.getElementById("imageOverlay");
+        // OVERLAY
+
+        const dialog =
+          document.getElementById(
+            "imageOverlay"
+          );
 
         // ALREADY OPEN
 
@@ -46,7 +113,11 @@ function startLayerListener() {
           return;
         }
 
-        const layer = app.activeDocument.activeLayers[0];
+        // CURRENT LAYER
+
+        const layer =
+          app.activeDocument
+            .activeLayers[0];
 
         if (!layer) {
           return;
@@ -54,59 +125,48 @@ function startLayerListener() {
 
         // SAME LAYER
 
-        if (layer.id === store.lastLayerId) {
+        if (
+          layer.id ===
+          store.lastLayerId
+        ) {
           return;
         }
 
-        store.lastLayerId = layer.id;
+        store.lastLayerId =
+          layer.id;
 
         // OPEN OVERLAY
 
         openDialog({
-          type: "images",
+          width: "1000px",
 
-          data: store.images,
+          height: "700px",
 
-          renderItem: ({ item, dialog }) => {
-            const card = document.createElement("div");
+          component:
+            React.createElement(
+              ImageResultsView,
+              {
+                images:
+                  store.images,
 
-            card.style.width = "70px";
-
-            card.style.height = "70px";
-
-            const img = document.createElement("img");
-
-            img.src = item.url;
-
-            img.style.width = "100%";
-
-            img.style.height = "100%";
-
-            img.style.objectFit = "cover";
-
-            img.style.cursor = "pointer";
-
-            img.style.opacity = item.used ? "0.3" : "1";
-
-            img.onclick = async () => {
-              dialog.close();
-
-              await placeImage(item.file);
-
-              item.used = true;
-
-              img.style.opacity = "0.3";
-            };
-
-            card.appendChild(img);
-
-            return card;
-          },
+                onImageClick:
+                  handleImageClick,
+              }
+            ),
         });
       } catch (err) {
-        console.log("listener error", err);
+        console.log(
+          "listener error",
+          err
+        );
+      } finally {
+        // RELEASE LOCK
+
+        setTimeout(() => {
+          isProcessing = false;
+        }, 60);
       }
-    },
+    }
   );
 }
 
