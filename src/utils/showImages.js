@@ -1,6 +1,4 @@
-async function showImages(
-  images
-) {
+async function showImages(images) {
   const imageData = [];
 
   for (const file of images) {
@@ -8,16 +6,12 @@ async function showImages(
       imageData.push({
         file,
 
-        path:
-          file.nativePath,
+        path: file.nativePath,
 
         used: false,
       });
     } catch (error) {
-      console.log(
-        "IMAGE LOAD ERROR:",
-        file.name
-      );
+      console.log("IMAGE LOAD ERROR:", file.name);
     }
   }
 

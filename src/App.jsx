@@ -6,6 +6,7 @@ const { startLayerListener } = require("./utils/startLayerListener");
 const { openSettingsDialog } = require("./utils/openSettingsDialog");
 const { store } = require("./store/store");
 const SearchBar = require("./components/SearchBar");
+const FolderLoader = require("./components/LoadFolder");
 
 function App() {
   React.useEffect(() => {
@@ -14,29 +15,6 @@ function App() {
 
   const [fillMode, setFillMode] = React.useState(false);
   window.store = store;
-  const openFolder = async () => {
-    const folder = await uxp.storage.localFileSystem.getFolder();
-
-    const entries = await folder.getEntries();
-
-    const imageFiles = entries.filter((file) => {
-      const name = file.name.toLowerCase();
-
-      return (
-        name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")
-      );
-    });
-
-    const thumbnails = await showImages(imageFiles);
-
-    // GLOBAL STORE
-
-    store.images = thumbnails;
-
-    store.currentFolder = folder.nativePath;
-
-    console.log(store.images);
-  };
 
   return (
     <div className="panel">
@@ -74,7 +52,6 @@ function App() {
         <button
           className={`mainButton ${fillMode ? "active" : ""}`}
           onClick={() => {
-            console.log(fillMode);
             const value = !fillMode;
 
             setFillMode(value);
@@ -96,9 +73,7 @@ function App() {
         <button className="smallButton">Export</button>
       </div>
       <div className="allRow">
-        <button className="loadButton" onClick={openFolder}>
-          Load Folder
-        </button>
+        <FolderLoader />
       </div>
     </div>
   );

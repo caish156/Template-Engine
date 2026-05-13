@@ -1,8 +1,33 @@
-const React = require("react");
+const React =
+  require("react");
 
-const ReactDOM = require(
-  "react-dom/client"
-);
+const ReactDOM =
+  require(
+    "react-dom/client"
+  );
+
+const { store } =
+  require(
+    "../store/store"
+  );
+
+// =====================
+// COMPONENTS
+// =====================
+
+const ImageResultsView =
+  require(
+    "../components/ImageResultsView"
+  );
+
+const TemplateResultsView =
+  require(
+    "../components/TemplateResultsView"
+  );
+
+// =====================
+// ROOTS
+// =====================
 
 let dialog = null;
 
@@ -10,109 +35,206 @@ let root = null;
 
 let rootNode = null;
 
-function openDialog({
-  width,
-  height,
-  component,
-}) {
-  // CREATE ONCE
+// =====================
+// OVERLAY ROOT
+// =====================
 
-  if (!dialog) {
-    dialog =
-      document.createElement(
-        "dialog"
-      );
+function OverlayRoot() {
+  // HIDE
 
-    dialog.id = "imageOverlay";
+  if (
+    !store.overlayVisible
+  ) {
+    return null;
+  }
 
-    dialog.style.padding =
-      "20px";
+  // =====================
+  // VIEW SWITCH
+  // =====================
 
-    dialog.style.border =
-      "1px solid #444";
-
-    dialog.style.background =
-      "#252525";
-
-    dialog.style.color =
-      "white";
-
-    dialog.style.overflow =
-      "auto";
-
-    document.body.appendChild(
-      dialog
+  if (
+    store.overlayView ===
+    "images"
+  ) {
+    return React.createElement(
+      ImageResultsView
     );
+  }
 
-    // ROOT NODE
-
-    rootNode =
-      document.createElement(
-        "div"
-      );
-
-    dialog.appendChild(
-      rootNode
-    );
-
-    // ROOT
-
-    root =
-      ReactDOM.createRoot(
-        rootNode
-      );
-
-    // CLEANUP ON CLOSE
-
-    dialog.addEventListener(
-  "close",
-  () => {
-    try {
-      // CLEAR REACT
-
-      root.render(null);
-
-      // RELEASE IMAGE URLS
-
-      if (
-        window.store &&
-        window.store.images
-      ) {
-        for (const item of window
-          .store.images) {
-          try {
-            URL.revokeObjectURL(
-              item.url
-            );
-          } catch (e) {}
-        }
+  if (
+    store.overlayView ===
+    "templates"
+  ) {
+    return React.createElement(
+      TemplateResultsView,
+      {
+        searchKey:
+          store.searchKey ||
+          "",
       }
-    } catch (e) {}
-  }
-);
+    );
   }
 
-  // SIZE
+  if (
+    store.overlayView ===
+    "settings"
+  ) {
+    return React.createElement(
+      "div",
+      null,
+      "Settings"
+    );
+  }
 
-  dialog.style.width =
-    width || "900px";
+  return null;
+}
 
-  dialog.style.height =
-    height || "700px";
+// =====================
+// RENDER
+// =====================
 
-  // RENDER
+function renderOverlay() {
+  if (!root) {
+    return;
+  }
 
-  root.render(component);
+  root.render(
+    React.createElement(
+      OverlayRoot
+    )
+  );
 
   // OPEN
 
-  if (!dialog.open) {
+  if (
+    store.overlayVisible &&
+    !dialog.open
+  ) {
     dialog.showModal();
   }
 
-  return dialog;
+  // CLOSE
+
+  if (
+    !store.overlayVisible &&
+    dialog.open
+  ) {
+    dialog.close();
+  }
+}
+
+// =====================
+// INIT
+// =====================
+
+function initOverlay() {
+  if (dialog) {
+    return;
+  }
+
+  // DIALOG
+
+  dialog =
+    document.createElement(
+      "dialog"
+    );
+
+  dialog.id =
+    "imageOverlay";
+
+  dialog.style.width =
+    "900px";
+
+  dialog.style.height =
+    "700px";
+
+  dialog.style.padding =
+    "20px";
+
+  dialog.style.border =
+    "1px solid #444";
+
+  dialog.style.background =
+    "#252525";
+
+  dialog.style.color =
+    "white";
+
+  dialog.style.overflow =
+    "auto";
+
+  document.body.appendChild(
+    dialog
+  );
+
+  // ROOT NODE
+
+  rootNode =
+    document.createElement(
+      "div"
+    );
+
+  dialog.appendChild(
+    rootNode
+  );
+
+  // ROOT
+
+  root =
+    ReactDOM.createRoot(
+      rootNode
+    );
+
+  // CLOSE EVENT
+
+  dialog.addEventListener(
+    "close",
+    () => {
+      store.overlayVisible =
+        false;
+
+      store.overlayView =
+        null;
+    }
+  );
+}
+
+// =====================
+// OPEN
+// =====================
+
+function openDialog({
+  view,
+}) {
+  initOverlay();
+
+  store.overlayView =
+    view;
+
+  store.overlayVisible =
+    true;
+
+  renderOverlay();
+}
+
+// =====================
+// CLOSE
+// =====================
+
+function closeDialog() {
+  store.overlayVisible =
+    false;
+
+  store.overlayView =
+    null;
+
+  renderOverlay();
 }
 
 module.exports = {
   openDialog,
+
+  closeDialog,
+
+  renderOverlay,
 };

@@ -25,23 +25,14 @@ function TemplateResultsView({ searchKey }) {
 
   async function loadTemplates() {
     try {
-      console.log("SEARCH KEY:", searchKey);
-
       // RUNTIME FOLDER OBJECT
 
       const folder = store.templateFolder;
-      console.log(folder);
       if (!folder) {
-        console.log("NO TEMPLATE FOLDER");
-
         return;
       }
 
-      console.log("FOLDER:", folder.nativePath);
-
       const entries = await folder.getEntries();
-
-      console.log("TOTAL ENTRIES:", entries.length);
 
       // FILTER JPG
 

@@ -11,7 +11,6 @@ function SearchBar() {
 
   async function handleSearch() {
     const type = store.searchType;
-    console.log(search, type, search.trim());
     if (!search.trim()) return;
 
     // =====================
@@ -26,8 +25,6 @@ function SearchBar() {
       const h = parts[1] || 0;
 
       const searchKey = `${v}v${h}h`;
-
-      console.log(searchKey, store.settings.templatePath);
 
       openDialog({
         type: "templates",
@@ -47,7 +44,6 @@ function SearchBar() {
     // =====================
 
     if (type === "clipart") {
-      console.log("clipart search");
     }
   }
 

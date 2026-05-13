@@ -15,8 +15,6 @@ function SettingsView() {
     if (!folder) return;
 
     await setTemplatePath(folder);
-
-    console.log("Template Folder:", folder.nativePath);
   }
 
   async function selectClipartFolder() {
@@ -25,8 +23,6 @@ function SettingsView() {
     if (!folder) return;
 
     await setClipartPath(folder);
-
-    console.log("Clipart Folder:", folder.nativePath);
   }
 
   function closeDialog() {

@@ -1,7 +1,10 @@
 const photoshop =
-  window.require("photoshop");
+  window.require(
+    "photoshop"
+  );
 
-const app = photoshop.app;
+const app =
+  photoshop.app;
 
 const action =
   photoshop.action;
@@ -10,8 +13,10 @@ const core =
   photoshop.core;
 
 const fs =
-  window.require("uxp")
-    .storage.localFileSystem;
+  window.require(
+    "uxp"
+  ).storage
+    .localFileSystem;
 
 const {
   getActivePSD,
@@ -19,13 +24,26 @@ const {
   "../utils/getActivePSD"
 );
 
+const {
+  getSelectedLayer,
+} = require(
+  "../utils/getSelectedLayer"
+);
+
 async function placeImage(
   file
 ) {
+  console.log(
+    "placeImage start",
+    file
+  );
+
   try {
     await core.executeAsModal(
       async () => {
-        // MAIN PSD
+        // =====================
+        // PSD
+        // =====================
 
         const psdDoc =
           getActivePSD();
@@ -33,119 +51,140 @@ async function placeImage(
         app.activeDocument =
           psdDoc;
 
+        // =====================
         // FRAME
+        // =====================
 
         const frameLayer =
-          psdDoc.activeLayers[0];
+          await getSelectedLayer(
+            psdDoc
+          );
 
         if (!frameLayer) {
           return;
         }
 
+        // =====================
         // FRAME BOUNDS
+        // =====================
 
-        const frameLeft =
-          Number(
-            frameLayer.bounds.left
-          );
+        const frame =
+          {
+            left: Number(
+              frameLayer
+                .bounds.left
+            ),
 
-        const frameTop =
-          Number(
-            frameLayer.bounds.top
-          );
+            top: Number(
+              frameLayer
+                .bounds.top
+            ),
 
-        const frameRight =
-          Number(
-            frameLayer.bounds.right
-          );
+            right: Number(
+              frameLayer
+                .bounds.right
+            ),
 
-        const frameBottom =
-          Number(
-            frameLayer.bounds.bottom
-          );
+            bottom: Number(
+              frameLayer
+                .bounds.bottom
+            ),
+          };
 
-        // FRAME SIZE
+        // =====================
+        // TOKEN
+        // =====================
 
-        const frameWidth =
-          frameRight -
-          frameLeft;
+   const token =
+  fs.createSessionToken(
+    file
+  );
 
-        const frameHeight =
-          frameBottom -
-          frameTop;
+        // =====================
+        // PLACE EVENT
+        // =====================
 
-        // FRAME CENTER
+        await action.batchPlay(
+          [
+            {
+              _obj:
+                "placeEvent",
 
-        const frameCenterX =
-          (frameLeft +
-            frameRight) /
-          2;
+              null: {
+                _path:
+                  token,
 
-        const frameCenterY =
-          (frameTop +
-            frameBottom) /
-          2;
-
-        // OPEN IMAGE
-
-        const imageDoc =
-          await app.open(file);
-
-        // IMAGE LAYER
-
-        const imageLayer =
-          imageDoc.activeLayers[0];
-
-        // DUPLICATE INTO PSD
-
-        await imageLayer.duplicate(
-          psdDoc
+                _kind:
+                  "local",
+              },
+            },
+          ],
+          {}
         );
 
-        // CLOSE IMAGE DOC
+        console.log(
+          "image placed"
+        );
 
-        await imageDoc.closeWithoutSaving();
 
-        // BACK TO PSD
-
-        app.activeDocument =
-          psdDoc;
-
-        // DUPLICATED LAYER
 
         const placedLayer =
-          psdDoc.activeLayers[0];
+          app
+            .activeDocument
+            .activeLayers[0];
 
+        // =====================
         // IMAGE BOUNDS
+        // =====================
 
         const bounds =
           placedLayer.bounds;
 
-        const imageLeft =
-          Number(bounds.left);
+        const left =
+          Number(
+            bounds.left
+          );
 
-        const imageTop =
-          Number(bounds.top);
+        const top =
+          Number(
+            bounds.top
+          );
 
-        const imageRight =
-          Number(bounds.right);
+        const right =
+          Number(
+            bounds.right
+          );
 
-        const imageBottom =
+        const bottom =
           Number(
             bounds.bottom
           );
 
+        // =====================
+        // FRAME SIZE
+        // =====================
+
+        const frameWidth =
+          frame.right -
+          frame.left;
+
+        const frameHeight =
+          frame.bottom -
+          frame.top;
+
+        // =====================
         // IMAGE SIZE
+        // =====================
 
         const imageWidth =
-          imageRight -
-          imageLeft;
+          right - left;
 
         const imageHeight =
-          imageBottom -
-          imageTop;
+          bottom - top;
 
+        // =====================
         // SCALE
+        // =====================
 
         const scaleX =
           frameWidth /
@@ -159,36 +198,14 @@ async function placeImage(
           Math.max(
             scaleX,
             scaleY
-          );
+          ) * 100;
 
-        // IMAGE CENTER
-
-        const imageCenterX =
-          (imageLeft +
-            imageRight) /
-          2;
-
-        const imageCenterY =
-          (imageTop +
-            imageBottom) /
-          2;
-
-        // MOVE
-
-        const moveX =
-          frameCenterX -
-          imageCenterX;
-
-        const moveY =
-          frameCenterY -
-          imageCenterY;
-
-        // FINAL OPERATIONS
+        // =====================
+        // TRANSFORM
+        // =====================
 
         await action.batchPlay(
           [
-            // SCALE
-
             {
               _obj:
                 "transform",
@@ -220,7 +237,7 @@ async function placeImage(
                   "percentUnit",
 
                 _value:
-                  scale * 100,
+                  scale,
               },
 
               height: {
@@ -228,16 +245,87 @@ async function placeImage(
                   "percentUnit",
 
                 _value:
-                  scale * 100,
+                  scale,
               },
 
               linked: true,
             },
+          ],
+          {}
+        );
 
-            // MOVE
+        // =====================
+        // NEW BOUNDS
+        // =====================
 
+        const newBounds =
+          placedLayer.bounds;
+
+        const newLeft =
+          Number(
+            newBounds.left
+          );
+
+        const newTop =
+          Number(
+            newBounds.top
+          );
+
+        const newRight =
+          Number(
+            newBounds.right
+          );
+
+        const newBottom =
+          Number(
+            newBounds.bottom
+          );
+
+        // =====================
+        // CENTER
+        // =====================
+
+        const imageCenterX =
+          (newLeft +
+            newRight) /
+          2;
+
+        const imageCenterY =
+          (newTop +
+            newBottom) /
+          2;
+
+        const frameCenterX =
+          (frame.left +
+            frame.right) /
+          2;
+
+        const frameCenterY =
+          (frame.top +
+            frame.bottom) /
+          2;
+
+        // =====================
+        // MOVE
+        // =====================
+
+        const moveX =
+          frameCenterX -
+          imageCenterX;
+
+        const moveY =
+          frameCenterY -
+          imageCenterY;
+
+        // =====================
+        // MOVE
+        // =====================
+
+        await action.batchPlay(
+          [
             {
-              _obj: "move",
+              _obj:
+                "move",
 
               _target: [
                 {
@@ -275,17 +363,80 @@ async function placeImage(
                   },
               },
             },
+          ],
+          {}
+        );
 
-            // CLIP
+        // =====================
+        // RASTERIZE
+        // =====================
 
+        await action.batchPlay(
+          [
+            {
+              _obj:
+                "rasterizeLayer",
+
+              _target: [
+                {
+                  _ref:
+                    "layer",
+
+                  _enum:
+                    "ordinal",
+
+                  _value:
+                    "targetEnum",
+                },
+              ],
+            },
+          ],
+          {}
+        );
+
+        // =====================
+        // CLIP
+        // =====================
+
+        await action.batchPlay(
+          [
             {
               _obj:
                 "groupEvent",
             },
           ],
+          {}
+        );
+
+        // =====================
+        // RENAME
+        // =====================
+
+        placedLayer.name =
+          `TEC__${file.name}`;
+            await action.batchPlay(
+          [
+            {
+              _obj:
+                "purge",
+
+              target: {
+                _enum:
+                  "purgeTarget",
+
+                _value:
+                  "allCaches",
+              },
+            },
+          ],
           {
-            synchronousExecution: true,
+            synchronousExecution:
+              true,
           }
+        );
+
+        console.log(
+          "clipping done"
         );
       },
       {
@@ -294,7 +445,10 @@ async function placeImage(
       }
     );
   } catch (err) {
-    console.log(err);
+    console.log(
+      "placeImage error",
+      err
+    );
   }
 }
 

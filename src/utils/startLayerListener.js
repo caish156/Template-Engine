@@ -1,85 +1,63 @@
-// photoshop/startLayerListener.js
-
-const React = require("react");
-
 const photoshop =
-  window.require("photoshop");
+  window.require(
+    "photoshop"
+  );
 
 const action =
   photoshop.action;
 
-const app = photoshop.app;
+const app =
+  photoshop.app;
 
-const { store } = require(
-  "../store/store"
-);
+const { store } =
+  require(
+    "../store/store"
+  );
 
-const { openDialog } = require(
+const {
+  openDialog,
+} = require(
   "../components/openDialog"
-);
-
-const ImageResultsView = require(
-  "../components/ImageResultsView.jsx"
-);
-
-const { placeImage } = require(
-  "../photoshop/placeImage"
 );
 
 // ======================
 // PROCESS LOCK
 // ======================
 
-let isProcessing = false;
-
-// ======================
-// IMAGE CLICK
-// ======================
-
-async function handleImageClick(
-  item
-) {
-  try {
-    const overlay =
-      document.getElementById(
-        "imageOverlay"
-      );
-
-    if (overlay) {
-      overlay.close();
-    }
-
-    await placeImage(item.file);
-
-    item.used = true;
-  } catch (error) {
-    console.log(
-      "PLACE IMAGE ERROR:",
-      error
-    );
-  }
-}
+let isProcessing =
+  false;
 
 // ======================
 // LISTENER
 // ======================
 
 function startLayerListener() {
+  console.log(
+    "listener started"
+  );
+
   // ALREADY STARTED
 
-  if (store.listenerStarted) {
+  if (
+    store.listenerStarted
+  ) {
     return;
   }
 
-  store.listenerStarted = true;
+  store.listenerStarted =
+    true;
 
+  // ======================
   // REAL LISTENER
+  // ======================
 
   action.addNotificationListener(
     ["select"],
 
     async () => {
-      // PREVENT EVENT SPAM
+      // ======================
+      // LOCK
+      // ======================
 
       if (isProcessing) {
         return;
@@ -88,32 +66,50 @@ function startLayerListener() {
       isProcessing = true;
 
       try {
-        // FILL MODE OFF
+        // ======================
+        // FILL MODE
+        // ======================
 
-        if (!store.fillMode) {
+        if (
+          !store.fillMode
+        ) {
           return;
         }
 
+        // ======================
         // NO IMAGES
+        // ======================
 
-        if (!store.images.length) {
+        if (
+          !store.images
+            .length
+        ) {
           return;
         }
 
-        // OVERLAY
+        // ======================
+        // OVERLAY OPEN
+        // ======================
 
-        const dialog =
-          document.getElementById(
-            "imageOverlay"
-          );
-
-        // ALREADY OPEN
-
-        if (dialog?.open) {
+        if (
+          store.overlayVisible
+        ) {
           return;
         }
 
+        // ======================
+        // ACTIVE DOC
+        // ======================
+
+        if (
+          !app.activeDocument
+        ) {
+          return;
+        }
+
+        // ======================
         // CURRENT LAYER
+        // ======================
 
         const layer =
           app.activeDocument
@@ -123,7 +119,9 @@ function startLayerListener() {
           return;
         }
 
+        // ======================
         // SAME LAYER
+        // ======================
 
         if (
           layer.id ===
@@ -135,24 +133,12 @@ function startLayerListener() {
         store.lastLayerId =
           layer.id;
 
+        // ======================
         // OPEN OVERLAY
+        // ======================
 
         openDialog({
-          width: "1000px",
-
-          height: "700px",
-
-          component:
-            React.createElement(
-              ImageResultsView,
-              {
-                images:
-                  store.images,
-
-                onImageClick:
-                  handleImageClick,
-              }
-            ),
+          view: "images",
         });
       } catch (err) {
         console.log(
@@ -160,10 +146,13 @@ function startLayerListener() {
           err
         );
       } finally {
+        // ======================
         // RELEASE LOCK
+        // ======================
 
         setTimeout(() => {
-          isProcessing = false;
+          isProcessing =
+            false;
         }, 60);
       }
     }
