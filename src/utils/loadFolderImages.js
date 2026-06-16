@@ -2,7 +2,7 @@ const { store } = require("../store/store");
 const uxp = window.require("uxp");
 const { generateThumbnail } = require("./generateThumbnail");
 
-async function loadFolderImages(rootFolder) {
+async function loadFolderImages(rootFolder, view = "image") {
   try {
     console.log("LOAD FOLDER START");
 
@@ -18,7 +18,7 @@ async function loadFolderImages(rootFolder) {
     // START RECURSIVE SCAN
     // =====================
 
-    await scanFolderRecursive(rootFolder);
+    await scanFolderRecursive(rootFolder, view);
 
     console.log("ALL IMAGES READY");
 
@@ -32,19 +32,43 @@ async function loadFolderImages(rootFolder) {
 // RECURSIVE SCAN
 // =========================================
 
-async function scanFolderRecursive(folder) {
+async function scanFolderRecursive(folder, view) {
   try {
     const entries = await folder.getEntries();
 
     // =====================
-    // FIND / CREATE CACHE
+    // VALID FILES
+    // =====================
+
+    const validFiles = entries.filter((entry) => {
+      if (!entry.isFile) return false;
+
+      const lower = entry.name.toLowerCase();
+
+      return (
+        lower.endsWith(".jpg") ||
+        lower.endsWith(".jpeg") ||
+        lower.endsWith(".png") ||
+        lower.endsWith(".webp") ||
+        lower.endsWith(".psd") ||
+        lower.endsWith(".psb")
+      );
+    });
+
+    // =====================
+    // FIND CACHE
     // =====================
 
     let thumbCacheFolder = entries.find(
       (entry) => entry.isFolder && entry.name === ".thumb_cache",
     );
 
-    if (!thumbCacheFolder) {
+    // =====================
+    // CREATE CACHE ONLY
+    // IF FILES EXIST
+    // =====================
+
+    if (validFiles.length > 0 && !thumbCacheFolder) {
       thumbCacheFolder = await folder.createFolder(".thumb_cache");
 
       console.log("created .thumb_cache", folder.nativePath);
@@ -56,7 +80,7 @@ async function scanFolderRecursive(folder) {
 
     for (const entry of entries) {
       // =====================
-      // SKIP CACHE FOLDER
+      // SKIP CACHE
       // =====================
 
       if (entry.isFolder && entry.name === ".thumb_cache") {
@@ -64,17 +88,17 @@ async function scanFolderRecursive(folder) {
       }
 
       // =====================
-      // RECURSIVE FOLDER
+      // RECURSIVE
       // =====================
 
       if (entry.isFolder) {
-        await scanFolderRecursive(entry);
+        await scanFolderRecursive(entry, view);
 
         continue;
       }
 
       // =====================
-      // IMAGE CHECK
+      // FILE TYPE
       // =====================
 
       const lower = entry.name.toLowerCase();
@@ -82,9 +106,28 @@ async function scanFolderRecursive(folder) {
       const isImage =
         lower.endsWith(".jpg") ||
         lower.endsWith(".jpeg") ||
-        lower.endsWith(".png");
+        lower.endsWith(".png") ||
+        lower.endsWith(".webp");
 
-      if (!isImage) {
+      const isPSD = lower.endsWith(".psd") || lower.endsWith(".psb");
+
+      if (!isImage && !isPSD) {
+        continue;
+      }
+
+      if (view === "image" && !isImage) {
+        continue;
+      }
+      const searchKey = (store.searchKey || "").trim().toLowerCase();
+
+      if (searchKey && !entry.name.toLowerCase().includes(searchKey)) {
+        continue;
+      }
+      // =====================
+      // NO CACHE
+      // =====================
+
+      if (!thumbCacheFolder) {
         continue;
       }
 
@@ -97,7 +140,7 @@ async function scanFolderRecursive(folder) {
       const thumbName = `${baseName}_thumb.jpg`;
 
       // =====================
-      // CHECK THUMB EXISTS
+      // FIND THUMB
       // =====================
 
       let thumbFile = null;
@@ -106,20 +149,18 @@ async function scanFolderRecursive(folder) {
         thumbFile = await thumbCacheFolder.getEntry(thumbName);
 
         console.log("thumb exists", thumbName);
-      } catch (err) {
+      } catch {
         console.log("thumb missing", thumbName);
       }
 
       // =====================
-      // GENERATE IF MISSING
+      // GENERATE
       // =====================
 
       if (!thumbFile) {
         thumbFile = await generateThumbnail({
           imageFile: entry,
-
           thumbFolder: thumbCacheFolder,
-
           thumbName,
         });
       }
@@ -140,18 +181,12 @@ async function scanFolderRecursive(folder) {
         const previewURL = URL.createObjectURL(blob);
 
         store.images.push({
-  file: entry,
-
-  name: entry.name,
-
-  original:
-    entry.nativePath,
-
-  thumb:
-    thumbFile.nativePath,
-
-  previewURL,
-});
+          file: entry,
+          name: entry.name,
+          original: entry.nativePath,
+          thumb: thumbFile.nativePath,
+          previewURL,
+        });
       }
     }
   } catch (err) {

@@ -10,11 +10,8 @@ const { openDialog } = require("../components/openDialog");
 async function openSettingsDialog() {
   console.log("openSettingsDialog");
   openDialog({
-    type: "settings",
-    width: "340px",
-    height: "260px",
-    data: [{}],
-    component: React.createElement(SettingsView),
+    view: "settings",
+    size: [300, 400],
   });
 }
 

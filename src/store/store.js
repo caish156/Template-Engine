@@ -16,7 +16,7 @@ const store = {
   // =====================
 
   fillMode: false,
-
+  scanRequired: false,
   // =====================
   // OVERLAY
   // =====================
@@ -45,18 +45,12 @@ const store = {
   // FOLDERS
   // =====================
 
-  templateFolder: null,
-
-  clipartFolder: null,
-
   // =====================
   // SETTINGS
   // =====================
 
   settings: {
-    templateFolder: "",
-
-    clipartFolder: "",
+    assetFolder: null,
   },
 };
 

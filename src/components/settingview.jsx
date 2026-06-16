@@ -5,24 +5,22 @@ const uxp = window.require("uxp");
 const fs = uxp.storage.localFileSystem;
 
 const { store } = require("../store/store");
-
+const { loadFolderImages } = require("../utils/loadFolderImages");
 const { setClipartPath, setTemplatePath } = require("../utils/setting");
 
 function SettingsView() {
-  async function selectTemplateFolder() {
+  async function selectAssetFolder() {
     const folder = await fs.getFolder();
 
     if (!folder) return;
 
-    await setTemplatePath(folder);
-  }
+    store.settings.assetFolder = folder;
 
-  async function selectClipartFolder() {
-    const folder = await fs.getFolder();
+    closeDialog();
 
-    if (!folder) return;
-
-    await setClipartPath(folder);
+    setTimeout(async () => {
+      await loadFolderImages(folder, "setting");
+    }, 100);
   }
 
   function closeDialog() {
@@ -32,85 +30,70 @@ function SettingsView() {
       dialog.close();
     }
   }
-
+  function clearDir() {
+    store.settings.assetFolder = null;
+  }
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: "7px",
+        gap: "12px",
+        padding: "10px",
       }}
     >
-      {/* TEMPLATE */}
-
-      <div>
-        <div
-          style={{
-            marginBottom: "5px",
-            fontSize: "12px",
-            padding: "5px",
-          }}
-        >
-          Templates Folder
-        </div>
-
-        <button
-          onClick={selectTemplateFolder}
-          style={{
-            margin: "0px",
-            width: "100%",
-            height: "34px",
-            background: "#3a3a3a",
-            color: "#d4d4d4",
-            border: "none",
-            borderRadius: "4px",
-            padding: "0 10px",
-            textAlign: "left",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {store.templateFolder?.nativePath || "Browse"}
-        </button>
+      <div
+        style={{
+          fontSize: "13px",
+          fontWeight: "600",
+        }}
+      >
+        Asset Root Folder
       </div>
 
-      {/* CLIPART */}
+      <button
+        onClick={selectAssetFolder}
+        className={`${store.assetFolder?.nativePath ? "active" : ""}`}
+        style={{
+          width: "100%",
+          height: "36px",
+          background: "#3a3a3a",
+          color: "#d4d4d4",
+          borderRadius: "4px",
+          padding: "0 10px",
+          textAlign: "left",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {store.assetFolder?.nativePath || "Select Asset Folder"}
+      </button>
 
-      <div>
-        <div
-          style={{
-            marginBottom: "5px",
-            fontSize: "12px",
-            padding: "5px",
-          }}
-        >
-          Clipart Folder
-        </div>
-
-        <button
-          onClick={selectClipartFolder}
-          style={{
-            width: "100%",
-            margin: "0px",
-            height: "34px",
-            background: "#3a3a3a",
-            color: "#d4d4d4",
-            border: "none",
-            borderRadius: "4px",
-            padding: "0 10px",
-            textAlign: "left",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {store.clipartFolder?.nativePath || "Browse"}
-        </button>
+      <div
+        style={{
+          fontSize: "11px",
+          opacity: 0.7,
+          lineHeight: "16px",
+        }}
+      >
+        Required folders:
+        <br />
+        Template, Floral, Leafs, Clipart, Text, Bg, Mask, Overlay
       </div>
-
-      {/* CLOSE */}
-
+      <button
+        onClick={clearDir}
+        style={{
+          marginTop: "10px",
+          height: "36px",
+          background: "#444",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+        }}
+      >
+        Clear
+      </button>
       <button
         onClick={closeDialog}
         style={{

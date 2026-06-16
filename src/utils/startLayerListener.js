@@ -1,51 +1,33 @@
-const photoshop =
-  window.require(
-    "photoshop"
-  );
+const photoshop = window.require("photoshop");
 
-const action =
-  photoshop.action;
+const action = photoshop.action;
 
-const app =
-  photoshop.app;
+const app = photoshop.app;
 
-const { store } =
-  require(
-    "../store/store"
-  );
+const { store } = require("../store/store");
 
-const {
-  openDialog,
-} = require(
-  "../components/openDialog"
-);
+const { openDialog } = require("../components/openDialog");
 
 // ======================
 // PROCESS LOCK
 // ======================
 
-let isProcessing =
-  false;
+let isProcessing = false;
 
 // ======================
 // LISTENER
 // ======================
 
 function startLayerListener() {
-  console.log(
-    "listener started"
-  );
+  console.log("listener started");
 
   // ALREADY STARTED
 
-  if (
-    store.listenerStarted
-  ) {
+  if (store.listenerStarted) {
     return;
   }
 
-  store.listenerStarted =
-    true;
+  store.listenerStarted = true;
 
   // ======================
   // REAL LISTENER
@@ -70,9 +52,7 @@ function startLayerListener() {
         // FILL MODE
         // ======================
 
-        if (
-          !store.fillMode
-        ) {
+        if (!store.fillMode) {
           return;
         }
 
@@ -80,10 +60,7 @@ function startLayerListener() {
         // NO IMAGES
         // ======================
 
-        if (
-          !store.images
-            .length
-        ) {
+        if (!store.images.length) {
           return;
         }
 
@@ -91,9 +68,7 @@ function startLayerListener() {
         // OVERLAY OPEN
         // ======================
 
-        if (
-          store.overlayVisible
-        ) {
+        if (store.overlayVisible) {
           return;
         }
 
@@ -101,9 +76,7 @@ function startLayerListener() {
         // ACTIVE DOC
         // ======================
 
-        if (
-          !app.activeDocument
-        ) {
+        if (!app.activeDocument) {
           return;
         }
 
@@ -111,9 +84,7 @@ function startLayerListener() {
         // CURRENT LAYER
         // ======================
 
-        const layer =
-          app.activeDocument
-            .activeLayers[0];
+        const layer = app.activeDocument.activeLayers[0];
 
         if (!layer) {
           return;
@@ -123,15 +94,11 @@ function startLayerListener() {
         // SAME LAYER
         // ======================
 
-        if (
-          layer.id ===
-          store.lastLayerId
-        ) {
+        if (layer.id === store.lastLayerId) {
           return;
         }
 
-        store.lastLayerId =
-          layer.id;
+        store.lastLayerId = layer.id;
 
         // ======================
         // OPEN OVERLAY
@@ -139,23 +106,20 @@ function startLayerListener() {
 
         openDialog({
           view: "images",
+          size: [700, 900],
         });
       } catch (err) {
-        console.log(
-          "listener error",
-          err
-        );
+        console.log("listener error", err);
       } finally {
         // ======================
         // RELEASE LOCK
         // ======================
 
         setTimeout(() => {
-          isProcessing =
-            false;
+          isProcessing = false;
         }, 60);
       }
-    }
+    },
   );
 }
 

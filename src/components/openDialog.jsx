@@ -1,29 +1,17 @@
-const React =
-  require("react");
+const React = require("react");
 
-const ReactDOM =
-  require(
-    "react-dom/client"
-  );
+const ReactDOM = require("react-dom/client");
 
-const { store } =
-  require(
-    "../store/store"
-  );
+const { store } = require("../store/store");
 
 // =====================
 // COMPONENTS
 // =====================
 
-const ImageResultsView =
-  require(
-    "../components/ImageResultsView"
-  );
+const ImageResultsView = require("../components/ImageResultsView");
 
-const TemplateResultsView =
-  require(
-    "../components/TemplateResultsView"
-  );
+const TemplateResultsView = require("../components/TemplateResultsView");
+const SettingsView = require("../components/settingview");
 
 // =====================
 // ROOTS
@@ -41,10 +29,8 @@ let rootNode = null;
 
 function OverlayRoot() {
   // HIDE
-
-  if (
-    !store.overlayVisible
-  ) {
+  console.log("OverlayRoot", store.overlayVisible, store.overlayView);
+  if (!store.overlayVisible) {
     return null;
   }
 
@@ -52,38 +38,14 @@ function OverlayRoot() {
   // VIEW SWITCH
   // =====================
 
-  if (
-    store.overlayView ===
-    "images"
-  ) {
-    return React.createElement(
-      ImageResultsView
-    );
+  if (store.overlayView === "images") {
+    return React.createElement(ImageResultsView);
   }
-
-  if (
-    store.overlayView ===
-    "templates"
-  ) {
-    return React.createElement(
-      TemplateResultsView,
-      {
-        searchKey:
-          store.searchKey ||
-          "",
-      }
-    );
+  if (store.overlayView === "assets") {
+    return React.createElement(ImageResultsView);
   }
-
-  if (
-    store.overlayView ===
-    "settings"
-  ) {
-    return React.createElement(
-      "div",
-      null,
-      "Settings"
-    );
+  if (store.overlayView === "settings") {
+    return React.createElement(SettingsView);
   }
 
   return null;
@@ -97,28 +59,18 @@ function renderOverlay() {
   if (!root) {
     return;
   }
-
-  root.render(
-    React.createElement(
-      OverlayRoot
-    )
-  );
+  console.log("renderOverlay");
+  root.render(React.createElement(OverlayRoot));
 
   // OPEN
 
-  if (
-    store.overlayVisible &&
-    !dialog.open
-  ) {
+  if (store.overlayVisible && !dialog.open) {
     dialog.showModal();
   }
 
   // CLOSE
 
-  if (
-    !store.overlayVisible &&
-    dialog.open
-  ) {
+  if (!store.overlayVisible && dialog.open) {
     dialog.close();
   }
 }
@@ -132,101 +84,88 @@ function initOverlay() {
     return;
   }
 
+  // =====================
   // DIALOG
+  // =====================
 
-  dialog =
-    document.createElement(
-      "dialog"
-    );
+  dialog = document.createElement("dialog");
 
-  dialog.id =
-    "imageOverlay";
+  dialog.id = "imageOverlay";
 
-  dialog.style.width =
-    "900px";
+  dialog.style.padding = "20px";
+  dialog.style.border = "1px solid #444";
+  dialog.style.background = "#252525";
+  dialog.style.color = "white";
+  dialog.style.overflow = "auto";
 
-  dialog.style.height =
-    "700px";
+  document.body.appendChild(dialog);
 
-  dialog.style.padding =
-    "20px";
-
-  dialog.style.border =
-    "1px solid #444";
-
-  dialog.style.background =
-    "#252525";
-
-  dialog.style.color =
-    "white";
-
-  dialog.style.overflow =
-    "auto";
-
-  document.body.appendChild(
-    dialog
-  );
-
+  // =====================
   // ROOT NODE
+  // =====================
 
-  rootNode =
-    document.createElement(
-      "div"
-    );
+  rootNode = document.createElement("div");
 
-  dialog.appendChild(
-    rootNode
-  );
+  dialog.appendChild(rootNode);
 
+  // =====================
   // ROOT
+  // =====================
 
-  root =
-    ReactDOM.createRoot(
-      rootNode
-    );
+  root = ReactDOM.createRoot(rootNode);
 
+  // =====================
   // CLOSE EVENT
+  // =====================
 
-  dialog.addEventListener(
-    "close",
-    () => {
-      store.overlayVisible =
-        false;
-
-      store.overlayView =
-        null;
-    }
-  );
+  dialog.addEventListener("close", () => {
+    store.overlayVisible = false;
+    
+  });
 }
 
 // =====================
 // OPEN
 // =====================
 
-function openDialog({
-  view,
-}) {
+function openDialog({ view, size }) {
   initOverlay();
 
-  store.overlayView =
-    view;
+  // =====================
+  // UPDATE SIZE EVERY TIME
+  // =====================
 
-  store.overlayVisible =
-    true;
+  dialog.style.height = `${size[0]}px`;
+  dialog.style.width = `${size[1]}px`;
+
+  console.log("openDialog", view, size);
+
+  // =====================
+  // STORE
+  // =====================
+
+  store.overlayView = view;
+  store.overlayVisible = true;
+
+  // =====================
+  // RENDER
+  // =====================
 
   renderOverlay();
 }
+
+module.exports = {
+  openDialog,
+};
 
 // =====================
 // CLOSE
 // =====================
 
 function closeDialog() {
-  store.overlayVisible =
-    false;
+  store.overlayVisible = false;
 
-  store.overlayView =
-    null;
+  store.overlayView = null;
 
   renderOverlay();
 }

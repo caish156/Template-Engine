@@ -12,13 +12,36 @@
     }
   ],
 
+  "icons": [
+    {
+      "width": 48,
+      "height": 48,
+      "path": "icons/TE.png",
+      "scale": [1, 2],
+      "theme": ["all"],
+      "species": ["pluginList"]
+    }
+  ],
+
   "entrypoints": [
     {
       "type": "panel",
       "id": "mainPanel",
+
       "label": {
         "default": "Template Engine"
-      }
+      },
+
+      "icons": [
+        {
+          "width": 48,
+          "height": 48,
+          "path": "icons/TE.png",
+          "scale": [1, 2],
+          "theme": ["all"],
+          "species": ["generic"]
+        }
+      ]
     }
   ]
 }

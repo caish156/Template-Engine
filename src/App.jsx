@@ -26,8 +26,13 @@ function App() {
           }}
         >
           <option value="template">Template</option>
-
-          <option value="clipart">Clipart</option>
+          <option value="floral">Floral</option>
+          <option value="leafs">Leafs</option>
+          <option value="clipart">Clip Arts</option>
+          <option value="text">Text</option>
+          <option value="bg">Background</option>
+          <option value="mask">Masks</option>
+          <option value="overlay">Overlays</option>
         </select>
 
         <button className="iconButton">
@@ -40,7 +45,6 @@ function App() {
             />
           </svg>
         </button>
-
         <button className="iconButton" onClick={openSettingsDialog}>
           S
         </button>
