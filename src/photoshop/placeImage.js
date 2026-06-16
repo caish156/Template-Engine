@@ -1,209 +1,306 @@
-const photoshop = require("photoshop");
+const photoshop = window.require("photoshop");
 
 const app = photoshop.app;
+
 const action = photoshop.action;
 
-const store = require("../store/store");
+const core = photoshop.core;
 
-const fs = require("uxp").storage.localFileSystem;
+const fs = window.require("uxp").storage.localFileSystem;
 
 const { getActivePSD } = require("../utils/getActivePSD");
 
 const { getSelectedLayer } = require("../utils/getSelectedLayer");
 
 async function placeImage(file) {
-  console.log("placeImage start", file);
+
 
   try {
-    const psdDoc = getActivePSD();
+    await core.executeAsModal(
+      async () => {
+        // =====================
+        // PSD
+        // =====================
 
-    app.activeDocument = psdDoc;
+        const psdDoc = getActivePSD();
 
-    const layer = await getSelectedLayer(psdDoc);
-    console.log(layer);
-    store.currentFrameBounds = {
-      left: Number(layer.bounds.left),
-      top: Number(layer.bounds.top),
-      right: Number(layer.bounds.right),
-      bottom: Number(layer.bounds.bottom),
-    };
+        app.activeDocument = psdDoc;
 
-    console.log("psd activated", store.currentFrameBounds);
+        // =====================
+        // FRAME
+        // =====================
 
-    const token = await fs.createSessionToken(file);
+        const frameLayer = await getSelectedLayer(psdDoc);
 
-    await action.batchPlay(
-      [
-        {
-          _obj: "placeEvent",
+        if (!frameLayer) {
+          return;
+        }
 
-          null: {
-            _path: token,
+        // =====================
+        // FRAME BOUNDS
+        // =====================
 
-            _kind: "local",
-          },
-        },
-      ],
-      {},
-    );
-    console.log("image placed");
+        const frame = {
+          left: Number(frameLayer.bounds.left),
 
-    const placedLayer = app.activeDocument.activeLayers[0];
+          top: Number(frameLayer.bounds.top),
 
-    const frame = store.currentFrameBounds;
+          right: Number(frameLayer.bounds.right),
 
-    // CURRENT IMAGE BOUNDS
+          bottom: Number(frameLayer.bounds.bottom),
+        };
 
-    const bounds = placedLayer.bounds;
+        // =====================
+        // TOKEN
+        // =====================
 
-    const left = Number(bounds.left);
+        const token = fs.createSessionToken(file);
 
-    const top = Number(bounds.top);
+        // =====================
+        // PLACE EVENT
+        // =====================
 
-    const right = Number(bounds.right);
-
-    const bottom = Number(bounds.bottom);
-
-    // FRAME SIZE
-
-    const frameWidth = frame.right - frame.left;
-
-    const frameHeight = frame.bottom - frame.top;
-
-    // IMAGE SIZE
-
-    const imageWidth = right - left;
-
-    const imageHeight = bottom - top;
-
-    // SCALE
-
-    const scaleX = frameWidth / imageWidth;
-
-    const scaleY = frameHeight / imageHeight;
-
-    const scale = Math.max(scaleX, scaleY) * 100;
-
-    // TRANSFORM
-
-    await action.batchPlay(
-      [
-        {
-          _obj: "transform",
-
-          _target: [
+        await action.batchPlay(
+          [
             {
-              _ref: "layer",
+              _obj: "placeEvent",
 
-              _enum: "ordinal",
+              null: {
+                _path: token,
 
-              _value: "targetEnum",
+                _kind: "local",
+              },
             },
           ],
+          {},
+        );
 
-          freeTransformCenterState: {
-            _enum: "quadCenterState",
+        console.log("image placed");
 
-            _value: "QCSAverage",
-          },
+        const placedLayer = app.activeDocument.activeLayers[0];
 
-          width: {
-            _unit: "percentUnit",
+        // =====================
+        // IMAGE BOUNDS
+        // =====================
 
-            _value: scale,
-          },
+        const bounds = placedLayer.bounds;
 
-          height: {
-            _unit: "percentUnit",
+        const left = Number(bounds.left);
 
-            _value: scale,
-          },
+        const top = Number(bounds.top);
 
-          linked: true,
-        },
-      ],
-      {},
-    );
+        const right = Number(bounds.right);
 
-    // NEW BOUNDS AFTER SCALE
+        const bottom = Number(bounds.bottom);
 
-    const newBounds = placedLayer.bounds;
+        // =====================
+        // FRAME SIZE
+        // =====================
 
-    const newLeft = Number(newBounds.left);
+        const frameWidth = frame.right - frame.left;
 
-    const newTop = Number(newBounds.top);
+        const frameHeight = frame.bottom - frame.top;
 
-    const newRight = Number(newBounds.right);
+        // =====================
+        // IMAGE SIZE
+        // =====================
 
-    const newBottom = Number(newBounds.bottom);
+        const imageWidth = right - left;
 
-    // CENTER
+        const imageHeight = bottom - top;
 
-    const imageCenterX = (newLeft + newRight) / 2;
+        // =====================
+        // SCALE
+        // =====================
 
-    const imageCenterY = (newTop + newBottom) / 2;
+        const scaleX = frameWidth / imageWidth;
 
-    const frameCenterX = (frame.left + frame.right) / 2;
+        const scaleY = frameHeight / imageHeight;
 
-    const frameCenterY = (frame.top + frame.bottom) / 2;
+        const scale = Math.max(scaleX, scaleY) * 100;
 
-    // MOVE
+        // =====================
+        // TRANSFORM
+        // =====================
 
-    const moveX = frameCenterX - imageCenterX;
-
-    const moveY = frameCenterY - imageCenterY;
-
-    // ALIGN
-
-    await action.batchPlay(
-      [
-        {
-          _obj: "move",
-
-          _target: [
+        await action.batchPlay(
+          [
             {
-              _ref: "layer",
+              _obj: "transform",
 
-              _enum: "ordinal",
+              _target: [
+                {
+                  _ref: "layer",
 
-              _value: "targetEnum",
+                  _enum: "ordinal",
+
+                  _value: "targetEnum",
+                },
+              ],
+
+              freeTransformCenterState: {
+                _enum: "quadCenterState",
+
+                _value: "QCSAverage",
+              },
+
+              width: {
+                _unit: "percentUnit",
+
+                _value: scale,
+              },
+
+              height: {
+                _unit: "percentUnit",
+
+                _value: scale,
+              },
+
+              linked: true,
             },
           ],
+          {},
+        );
 
-          to: {
-            _obj: "offset",
+        // =====================
+        // NEW BOUNDS
+        // =====================
 
-            horizontal: {
-              _unit: "pixelsUnit",
+        const newBounds = placedLayer.bounds;
 
-              _value: moveX,
+        const newLeft = Number(newBounds.left);
+
+        const newTop = Number(newBounds.top);
+
+        const newRight = Number(newBounds.right);
+
+        const newBottom = Number(newBounds.bottom);
+
+        // =====================
+        // CENTER
+        // =====================
+
+        const imageCenterX = (newLeft + newRight) / 2;
+
+        const imageCenterY = (newTop + newBottom) / 2;
+
+        const frameCenterX = (frame.left + frame.right) / 2;
+
+        const frameCenterY = (frame.top + frame.bottom) / 2;
+
+        // =====================
+        // MOVE
+        // =====================
+
+        const moveX = frameCenterX - imageCenterX;
+
+        const moveY = frameCenterY - imageCenterY;
+
+        // =====================
+        // MOVE
+        // =====================
+
+        await action.batchPlay(
+          [
+            {
+              _obj: "move",
+
+              _target: [
+                {
+                  _ref: "layer",
+
+                  _enum: "ordinal",
+
+                  _value: "targetEnum",
+                },
+              ],
+
+              to: {
+                _obj: "offset",
+
+                horizontal: {
+                  _unit: "pixelsUnit",
+
+                  _value: moveX,
+                },
+
+                vertical: {
+                  _unit: "pixelsUnit",
+
+                  _value: moveY,
+                },
+              },
             },
+          ],
+          {},
+        );
 
-            vertical: {
-              _unit: "pixelsUnit",
+        // =====================
+        // RASTERIZE
+        // =====================
 
-              _value: moveY,
+        await action.batchPlay(
+          [
+            {
+              _obj: "rasterizeLayer",
+
+              _target: [
+                {
+                  _ref: "layer",
+
+                  _enum: "ordinal",
+
+                  _value: "targetEnum",
+                },
+              ],
             },
+          ],
+          {},
+        );
+
+        // =====================
+        // CLIP
+        // =====================
+
+        await action.batchPlay(
+          [
+            {
+              _obj: "groupEvent",
+            },
+          ],
+          {},
+        );
+
+        // =====================
+        // RENAME
+        // =====================
+
+        placedLayer.name = `TEC__${file.name}`;
+        await action.batchPlay(
+          [
+            {
+              _obj: "purge",
+
+              target: {
+                _enum: "purgeTarget",
+
+                _value: "allCaches",
+              },
+            },
+          ],
+          {
+            synchronousExecution: true,
           },
-        },
-      ],
-      {},
+        );
+
+        console.log("clipping done");
+      },
+      {
+        commandName: "Place Image",
+      },
     );
-
-    // CLIPPING
-
-    await action.batchPlay(
-      [
-        {
-          _obj: "groupEvent",
-        },
-      ],
-      {},
-    );
-
-    console.log("clipping done");
   } catch (err) {
-    console.log(err);
+    console.log("placeImage error", err);
   }
 }
 

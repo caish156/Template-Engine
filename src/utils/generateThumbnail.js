@@ -1,0 +1,199 @@
+const uxp = window.require("uxp");
+
+const photoshop = window.require("photoshop");
+
+const { app } = photoshop;
+
+const { core } = photoshop;
+
+const { constants } = photoshop;
+
+const action = photoshop.action;
+
+const fs = uxp.storage.localFileSystem;
+
+// =========================================
+// CONFIG
+// =========================================
+
+const MAX_SIZE = 150;
+
+const JPEG_QUALITY = 40;
+
+// =========================================
+// MAIN
+// =========================================
+
+async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
+  let doc = null;
+
+  try {
+    console.log("generateThumbnail", imageFile.name);
+
+    // =====================
+    // CREATE FILE
+    // =====================
+
+    const thumbFile = await thumbFolder.createFile(thumbName, {
+      overwrite: true,
+    });
+
+    // =====================
+    // SINGLE MODAL
+    // =====================
+
+    await core.executeAsModal(
+      async () => {
+        try {
+          // =====================
+          // OPEN
+          // =====================
+
+          doc = await app.open(imageFile);
+
+          console.log("opened", imageFile.name);
+
+          // =====================
+          // SIZE
+          // =====================
+
+          let width = doc.width;
+
+          let height = doc.height;
+
+          const scale = MAX_SIZE / Math.max(width, height);
+
+          width = Math.round(width * scale);
+
+          height = Math.round(height * scale);
+
+          console.log("resize target", width, height);
+
+          // =====================
+          // RESIZE
+          // =====================
+
+          await action.batchPlay(
+            [
+              {
+                _obj: "imageSize",
+
+                width: {
+                  _unit: "pixelsUnit",
+
+                  _value: width,
+                },
+
+                height: {
+                  _unit: "pixelsUnit",
+
+                  _value: height,
+                },
+
+                constrainProportions: true,
+
+                interfaceIconFrameDimmed: {
+                  _enum: "interpolationType",
+
+                  _value: "automaticInterpolation",
+                },
+              },
+            ],
+            {
+              synchronousExecution: true,
+            },
+          );
+
+          console.log("resized");
+
+          // =====================
+          // EXPORT
+          // =====================
+
+          await exportJPEG({
+            file: thumbFile,
+            quality: JPEG_QUALITY,
+          });
+
+          console.log("thumb exported");
+        } finally {
+          // =====================
+          // CLOSE
+          // =====================
+
+          if (doc) {
+            await doc.close(constants.SaveOptions.DONOTSAVECHANGES);
+
+            doc = null;
+          }
+        }
+      },
+      {
+        commandName: "Generate Thumbnail",
+      },
+    );
+
+    console.log("thumb saved", thumbName);
+
+    return thumbFile;
+  } catch (err) {
+    console.log("generateThumbnail error", imageFile.name, err);
+
+    doc = null;
+
+    return null;
+  }
+}
+
+// =========================================
+// EXPORT JPEG
+// =========================================
+
+// =========================================
+// EXPORT JPEG
+// =========================================
+
+async function exportJPEG({ file, quality }) {
+  const token = fs.createSessionToken(file);
+
+  await action.batchPlay(
+    [
+      {
+        _obj: "save",
+
+        as: {
+          _obj: "JPEG",
+
+          extendedQuality: quality,
+
+          matteColor: {
+            _enum: "matteColor",
+
+            _value: "none",
+          },
+        },
+
+        in: {
+          _path: token,
+
+          _kind: "local",
+        },
+
+        lowerCase: true,
+
+        saveStage: {
+          _enum: "saveStageType",
+
+          _value: "saveBegin",
+        },
+      },
+    ],
+    {
+      synchronousExecution: true,
+    },
+  );
+}
+
+module.exports = {
+  generateThumbnail,
+};

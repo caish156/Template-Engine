@@ -1,4 +1,4 @@
-const { app } = require("photoshop");
+const { app } = window.require("photoshop");
 
 function getActivePSD() {
   const doc = app.activeDocument;
