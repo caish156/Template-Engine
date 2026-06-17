@@ -13,8 +13,6 @@ const { getActivePSD } = require("../utils/getActivePSD");
 const { getSelectedLayer } = require("../utils/getSelectedLayer");
 
 async function placeImage(file) {
-
-
   try {
     await core.executeAsModal(
       async () => {

@@ -5,7 +5,7 @@ const action = photoshop.action;
 const app = photoshop.app;
 
 const { store } = require("../store/store");
-
+const { loadFolderImages } = require("./loadFolderImages");
 const { openDialog } = require("../components/openDialog");
 
 // ======================
@@ -60,7 +60,7 @@ function startLayerListener() {
         // NO IMAGES
         // ======================
 
-        if (!store.images.length) {
+        if (!store.imageFolder) {
           return;
         }
 
@@ -103,6 +103,9 @@ function startLayerListener() {
         // ======================
         // OPEN OVERLAY
         // ======================
+        console.log("CURRENT FOLDER", store.imageFolder);
+        store.searchKey = "";
+        await loadFolderImages(store.imageFolder, "image");
 
         openDialog({
           view: "images",

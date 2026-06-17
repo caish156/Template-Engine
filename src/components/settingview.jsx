@@ -17,10 +17,6 @@ function SettingsView() {
     store.settings.assetFolder = folder;
 
     closeDialog();
-
-    setTimeout(async () => {
-      await loadFolderImages(folder, "setting");
-    }, 100);
   }
 
   function closeDialog() {

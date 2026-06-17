@@ -2,30 +2,22 @@ const { store } = require("../store/store");
 const uxp = window.require("uxp");
 const { generateThumbnail } = require("./generateThumbnail");
 
-async function loadFolderImages(rootFolder, view = "image") {
-  try {
-    console.log("LOAD FOLDER START");
-
-    // =====================
-    // RESET
-    // =====================
-
-    store.images = [];
-
-    store.currentFolder = rootFolder.nativePath;
-
-    // =====================
-    // START RECURSIVE SCAN
-    // =====================
-
-    await scanFolderRecursive(rootFolder, view);
-
-    console.log("ALL IMAGES READY");
-
-    console.log(store.images);
-  } catch (err) {
-    console.log("loadFolderImages error", err);
+async function loadFolderImages(rootFolder, view) {
+  if (view === "image") {
+    store.imageFolder = rootFolder;
+    store.imageResults = [];
   }
+
+  if (view === "asset") {
+    store.assetFolderCurrent = rootFolder;
+    store.assetResults = [];
+  }
+  if (view === "template") {
+    store.assetFolderCurrent = rootFolder;
+    store.templateResults = [];
+  }
+
+  await scanFolderRecursive(rootFolder, view);
 }
 
 // =========================================
@@ -180,13 +172,28 @@ async function scanFolderRecursive(folder, view) {
 
         const previewURL = URL.createObjectURL(blob);
 
-        store.images.push({
+        const item = {
           file: entry,
           name: entry.name,
           original: entry.nativePath,
           thumb: thumbFile.nativePath,
           previewURL,
-        });
+        };
+        if (view === "image") {
+          store.imageResults.push(item);
+        }
+
+        if (view === "asset") {
+          store.assetResults.push(item);
+        }
+
+        if (view === "template") {
+          if (!isPSD) {
+            continue;
+          }
+
+          store.templateResults.push(item);
+        }
       }
     }
   } catch (err) {

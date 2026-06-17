@@ -21,7 +21,7 @@ async function openAsset(file) {
         },
         {
           commandName: "Open Template",
-        }
+        },
       );
 
       return;
@@ -47,14 +47,13 @@ async function openAsset(file) {
               },
             },
           ],
-          {}
+          {},
         );
       },
       {
         commandName: "Place Asset",
-      }
+      },
     );
-
   } catch (err) {
     console.log("openAsset error", err);
   }

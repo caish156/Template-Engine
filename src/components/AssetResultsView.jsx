@@ -1,11 +1,7 @@
 const React = require("react");
 
 const { store } = require("../store/store");
-const { placeImage } = require("../photoshop/placeImage");
-
-// ======================
-// STATIC STYLES
-// ======================
+const { openAsset } = require("../photoshop/openAsset");
 
 const containerStyle = {
   display: "flex",
@@ -14,8 +10,8 @@ const containerStyle = {
   padding: "10px",
 };
 
-function ImageResultsView() {
-  async function handleImageClick(item) {
+function AssetResultsView() {
+  async function handleAssetClick(item) {
     try {
       const dialog = document.getElementById("imageOverlay");
 
@@ -25,13 +21,13 @@ function ImageResultsView() {
 
       await new Promise((r) => setTimeout(r, 50));
 
-      await placeImage(item.file);
+      await openAsset(item.file);
     } catch (err) {
       console.log(err);
     }
   }
 
-  const items = store.imageResults || [];
+  const items = store.assetResults || [];
 
   return (
     <div style={containerStyle}>
@@ -39,7 +35,7 @@ function ImageResultsView() {
         return (
           <div
             key={index}
-            onClick={() => handleImageClick(item)}
+            onClick={() => handleAssetClick(item)}
             style={{
               width: "120px",
               height: "120px",
@@ -70,4 +66,4 @@ function ImageResultsView() {
   );
 }
 
-module.exports = ImageResultsView;
+module.exports = AssetResultsView;

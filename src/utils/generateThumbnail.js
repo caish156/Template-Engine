@@ -1,24 +1,12 @@
 const uxp = window.require("uxp");
-
 const photoshop = window.require("photoshop");
 
 const { app } = photoshop;
-
 const { core } = photoshop;
-
 const { constants } = photoshop;
 
 const action = photoshop.action;
-
 const fs = uxp.storage.localFileSystem;
-
-// =========================================
-// CONFIG
-// =========================================
-
-const MAX_SIZE = 150;
-
-const JPEG_QUALITY = 40;
 
 // =========================================
 // MAIN
@@ -29,6 +17,13 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
 
   try {
     console.log("generateThumbnail", imageFile.name);
+
+    const isPSD =
+      imageFile.name.toLowerCase().endsWith(".psd") ||
+      imageFile.name.toLowerCase().endsWith(".psb");
+
+    const MAX_SIZE = isPSD ? 1200 : 150;
+    const JPEG_QUALITY = isPSD ? 90 : 40;
 
     // =====================
     // CREATE FILE
@@ -58,16 +53,14 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
           // =====================
 
           let width = doc.width;
-
           let height = doc.height;
 
           const scale = MAX_SIZE / Math.max(width, height);
 
           width = Math.round(width * scale);
-
           height = Math.round(height * scale);
 
-          console.log("resize target", width, height);
+          console.log("resize target", width, height, "PSD:", isPSD);
 
           // =====================
           // RESIZE
@@ -80,13 +73,11 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
 
                 width: {
                   _unit: "pixelsUnit",
-
                   _value: width,
                 },
 
                 height: {
                   _unit: "pixelsUnit",
-
                   _value: height,
                 },
 
@@ -94,7 +85,6 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
 
                 interfaceIconFrameDimmed: {
                   _enum: "interpolationType",
-
                   _value: "automaticInterpolation",
                 },
               },
@@ -123,7 +113,6 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
 
           if (doc) {
             await doc.close(constants.SaveOptions.DONOTSAVECHANGES);
-
             doc = null;
           }
         }
@@ -149,10 +138,6 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
 // EXPORT JPEG
 // =========================================
 
-// =========================================
-// EXPORT JPEG
-// =========================================
-
 async function exportJPEG({ file, quality }) {
   const token = fs.createSessionToken(file);
 
@@ -168,14 +153,12 @@ async function exportJPEG({ file, quality }) {
 
           matteColor: {
             _enum: "matteColor",
-
             _value: "none",
           },
         },
 
         in: {
           _path: token,
-
           _kind: "local",
         },
 
@@ -183,7 +166,6 @@ async function exportJPEG({ file, quality }) {
 
         saveStage: {
           _enum: "saveStageType",
-
           _value: "saveBegin",
         },
       },
