@@ -1,49 +1,33 @@
 const React = require("react");
-
 const ReactDOM = require("react-dom/client");
-
 const { store } = require("../store/store");
-
-// =====================
-// COMPONENTS
-// =====================
-
 const ImageResultsView = require("../components/ImageResultsView");
-
+const AssetResultsView = require("../components/AssetResultsView");
 const TemplateResultsView = require("../components/TemplateResultsView");
 const SettingsView = require("../components/settingview");
 
-// =====================
-// ROOTS
-// =====================
-
 let dialog = null;
-
 let root = null;
-
 let rootNode = null;
 
-// =====================
-// OVERLAY ROOT
-// =====================
-
 function OverlayRoot() {
-  // HIDE
   console.log("OverlayRoot", store.overlayVisible, store.overlayView);
   if (!store.overlayVisible) {
     return null;
   }
 
-  // =====================
-  // VIEW SWITCH
-  // =====================
-
   if (store.overlayView === "images") {
     return React.createElement(ImageResultsView);
   }
+
   if (store.overlayView === "assets") {
-    return React.createElement(ImageResultsView);
+    if (store.searchType === "template") {
+      return React.createElement(TemplateResultsView);
+    }
+
+    return React.createElement(AssetResultsView);
   }
+
   if (store.overlayView === "settings") {
     return React.createElement(SettingsView);
   }
@@ -84,14 +68,8 @@ function initOverlay() {
     return;
   }
 
-  // =====================
-  // DIALOG
-  // =====================
-
   dialog = document.createElement("dialog");
-
   dialog.id = "imageOverlay";
-
   dialog.style.padding = "20px";
   dialog.style.border = "1px solid #444";
   dialog.style.background = "#252525";
@@ -105,28 +83,14 @@ function initOverlay() {
   // =====================
 
   rootNode = document.createElement("div");
-
   dialog.appendChild(rootNode);
-
-  // =====================
-  // ROOT
-  // =====================
 
   root = ReactDOM.createRoot(rootNode);
 
-  // =====================
-  // CLOSE EVENT
-  // =====================
-
   dialog.addEventListener("close", () => {
     store.overlayVisible = false;
-    
   });
 }
-
-// =====================
-// OPEN
-// =====================
 
 function openDialog({ view, size }) {
   initOverlay();
@@ -147,16 +111,8 @@ function openDialog({ view, size }) {
   store.overlayView = view;
   store.overlayVisible = true;
 
-  // =====================
-  // RENDER
-  // =====================
-
   renderOverlay();
 }
-
-module.exports = {
-  openDialog,
-};
 
 // =====================
 // CLOSE
@@ -164,7 +120,6 @@ module.exports = {
 
 function closeDialog() {
   store.overlayVisible = false;
-
   store.overlayView = null;
 
   renderOverlay();
@@ -172,8 +127,6 @@ function closeDialog() {
 
 module.exports = {
   openDialog,
-
   closeDialog,
-
   renderOverlay,
 };

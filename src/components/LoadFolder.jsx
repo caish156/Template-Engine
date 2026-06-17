@@ -1,7 +1,7 @@
 const React = require("react");
 
 const uxp = window.require("uxp");
-
+const { store } = require("../store/store");
 const fs = uxp.storage.localFileSystem;
 
 const { loadFolderImages } = require("../utils/loadFolderImages");
@@ -9,21 +9,15 @@ const { loadFolderImages } = require("../utils/loadFolderImages");
 function FolderLoader() {
   async function openFolder() {
     try {
-      // =====================
-      // SELECT FOLDER
-      // =====================
-
       const folder = await fs.getFolder();
 
       if (!folder) return;
 
       console.log("selected folder", folder.nativePath);
 
-      // =====================
-      // LOAD IMAGES
-      // =====================
+      store.imageFolder = folder;
 
-      await loadFolderImages(folder);
+      await loadFolderImages(folder, "image");
 
       console.log("folder loaded");
     } catch (err) {

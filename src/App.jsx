@@ -7,6 +7,7 @@ const { openSettingsDialog } = require("./utils/openSettingsDialog");
 const { store } = require("./store/store");
 const SearchBar = require("./components/SearchBar");
 const FolderLoader = require("./components/LoadFolder");
+const AlbumSizeConverter = require("./components/AlbumSizeConverter");
 
 function App() {
   React.useEffect(() => {
@@ -16,6 +17,7 @@ function App() {
   const [fillMode, setFillMode] = React.useState(false);
   window.store = store;
 
+  console.log(store);
   return (
     <div className="panel">
       <div className="allRow">
@@ -25,6 +27,7 @@ function App() {
             store.searchType = e.target.value;
           }}
         >
+          <option value="">Assets</option>
           <option value="template">Template</option>
           <option value="floral">Floral</option>
           <option value="leafs">Leafs</option>
@@ -70,9 +73,7 @@ function App() {
       </div>
 
       <div className="allRow">
-        <button className="smallButton"> Left</button>
-
-        <button className="smallButton"> Right</button>
+        <AlbumSizeConverter />
 
         <button className="smallButton">Export</button>
       </div>

@@ -1,54 +1,21 @@
 // src/store/store.js
 
 const store = {
-  // =====================
-  // IMAGES
-  // =====================
-
-  images: [],
-
+  albumSize: "--x--",
+  imageResults: [],
+  assetResults: [],
+  templateResults: [],
   currentFolder: null,
-
-  currentFrameBounds: null,
-
-  // =====================
-  // MODES
-  // =====================
-
+  currentFolderPath: null,
+  imageFolder: null,
+  assetFolderCurrent: null,
   fillMode: false,
-  scanRequired: false,
-  // =====================
-  // OVERLAY
-  // =====================
-
   overlayVisible: false,
-
   overlayView: null,
-
-  // =====================
-  // LISTENER
-  // =====================
-
   listenerStarted: false,
-
   lastLayerId: null,
-
-  // =====================
-  // SEARCH
-  // =====================
-
   searchType: "template",
-
   searchKey: "",
-
-  // =====================
-  // FOLDERS
-  // =====================
-
-  // =====================
-  // SETTINGS
-  // =====================
-
   settings: {
     assetFolder: null,
   },

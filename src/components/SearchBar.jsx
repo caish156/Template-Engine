@@ -36,18 +36,26 @@ function SearchBar() {
         return;
       }
 
-      console.log("START LOAD");
+      store.pickerMode = "asset";
 
-      await loadFolderImages(targetFolder, "setting");
+      console.log("SEARCH START");
+      const mode = type === "template" ? "template" : "asset";
 
-      console.log("LOAD COMPLETE");
+      await loadFolderImages(targetFolder, mode);
+      const dialogSize = mode === "template" ? [900, 1200] : [700, 900];
 
       openDialog({
         view: "assets",
-        size: [700, 900],
+        size: dialogSize,
       });
 
-      console.log("RESULTS:", store.images.length);
+      console.log("DIALOG OPEN");
+      setSearch("");
+      if (mode === "template") {
+        console.log("RESULTS:", store.templateResults.length);
+      } else {
+        console.log("RESULTS:", store.assetResults.length);
+      }
     } catch (err) {
       console.log("SEARCH ERROR:", err);
     }
