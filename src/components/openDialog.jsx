@@ -11,7 +11,6 @@ let root = null;
 let rootNode = null;
 
 function OverlayRoot() {
-  console.log("OverlayRoot", store.overlayVisible, store.overlayView);
   if (!store.overlayVisible) {
     return null;
   }
@@ -43,7 +42,7 @@ function renderOverlay() {
   if (!root) {
     return;
   }
-  console.log("renderOverlay");
+ 
   root.render(React.createElement(OverlayRoot));
 
   // OPEN
@@ -102,7 +101,7 @@ function openDialog({ view, size }) {
   dialog.style.height = `${size[0]}px`;
   dialog.style.width = `${size[1]}px`;
 
-  console.log("openDialog", view, size);
+
 
   // =====================
   // STORE

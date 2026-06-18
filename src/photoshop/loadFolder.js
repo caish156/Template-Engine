@@ -5,7 +5,7 @@ const state = require("../store/store");
 const { showImages } = require("../utils/showImages");
 
 async function loadFolder() {
-  console.log("loadFolder");
+ 
 
   try {
     const folder = await uxp.storage.localFileSystem.getFolder();
@@ -35,7 +35,7 @@ async function loadFolder() {
       );
     });
 
-    console.log("images", images.length);
+    
 
     // SAVE STATE
 

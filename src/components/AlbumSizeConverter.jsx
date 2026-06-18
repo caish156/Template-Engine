@@ -41,7 +41,6 @@ function AlbumSizeConverter() {
 
       store.currentAlbumSize = size;
 
-      console.log("CURRENT SIZE:", size);
     } catch (err) {
       console.log(err);
     }
@@ -72,10 +71,7 @@ function AlbumSizeConverter() {
         onChange={(e) => {
           store.albumSize = e.target.value;
 
-          console.log(
-            "TARGET CHANGED:",
-            store.albumSize,
-          );
+     
         }}
       >
         <option value="">

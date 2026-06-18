@@ -8,7 +8,6 @@ const SettingsView = require("../components/settingview.jsx");
 const { openDialog } = require("../components/openDialog");
 
 async function openSettingsDialog() {
-  console.log("openSettingsDialog");
   openDialog({
     view: "settings",
     size: [300, 400],

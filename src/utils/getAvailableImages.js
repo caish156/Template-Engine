@@ -5,7 +5,6 @@ let usedImages = [];
 // utils/getAvailableImages.js
 
 function getAvailableImages(frameInfo) {
-  console.log("getAvailableImages");
 
   try {
     const docs = app.documents;
@@ -67,9 +66,7 @@ function getAvailableImages(frameInfo) {
       }
     }
 
-    console.log("available images", result.length);
-
-    return result;
+      return result;
   } catch (err) {
     console.log("getAvailableImages error", err);
 
@@ -78,7 +75,6 @@ function getAvailableImages(frameInfo) {
 }
 
 function markImageUsed(imageName) {
-  console.log("markImageUsed");
 
   try {
     usedImages.push(imageName.toLowerCase());
@@ -88,7 +84,6 @@ function markImageUsed(imageName) {
 }
 
 function clearUsedImages() {
-  console.log("clearUsedImages");
 
   try {
     usedImages = [];

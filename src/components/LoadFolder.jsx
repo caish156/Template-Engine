@@ -13,15 +13,15 @@ function FolderLoader() {
 
       if (!folder) return;
 
-      console.log("selected folder", folder.nativePath);
+    
 
       store.imageFolder = folder;
 
       await loadFolderImages(folder, "image");
 
-      console.log("folder loaded");
+
     } catch (err) {
-      console.log("folder load error", err);
+   
     }
   }
 

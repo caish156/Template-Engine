@@ -16,7 +16,6 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
   let doc = null;
 
   try {
-    console.log("generateThumbnail", imageFile.name);
 
     const isPSD =
       imageFile.name.toLowerCase().endsWith(".psd") ||
@@ -46,7 +45,6 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
 
           doc = await app.open(imageFile);
 
-          console.log("opened", imageFile.name);
 
           // =====================
           // SIZE
@@ -59,8 +57,6 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
 
           width = Math.round(width * scale);
           height = Math.round(height * scale);
-
-          console.log("resize target", width, height, "PSD:", isPSD);
 
           // =====================
           // RESIZE
@@ -94,8 +90,6 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
             },
           );
 
-          console.log("resized");
-
           // =====================
           // EXPORT
           // =====================
@@ -105,7 +99,6 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
             quality: JPEG_QUALITY,
           });
 
-          console.log("thumb exported");
         } finally {
           // =====================
           // CLOSE
@@ -122,7 +115,6 @@ async function generateThumbnail({ imageFile, thumbFolder, thumbName }) {
       },
     );
 
-    console.log("thumb saved", thumbName);
 
     return thumbFile;
   } catch (err) {

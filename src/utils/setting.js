@@ -51,7 +51,6 @@ async function saveSettings() {
     format: formats.utf8,
   });
 
-  console.log("SETTINGS SAVED");
 }
 
 // ======================

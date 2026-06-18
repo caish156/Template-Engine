@@ -73,7 +73,7 @@ async function placeImage(file) {
           {},
         );
 
-        console.log("image placed");
+   
 
         const placedLayer = app.activeDocument.activeLayers[0];
 
@@ -291,7 +291,7 @@ async function placeImage(file) {
           },
         );
 
-        console.log("clipping done");
+      
       },
       {
         commandName: "Place Image",

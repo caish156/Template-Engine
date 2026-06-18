@@ -20,7 +20,7 @@ function SearchBar() {
       const assetRoot = store.settings.assetFolder;
 
       if (!assetRoot) {
-        console.log("No Asset Folder");
+    
         return;
       }
 
@@ -32,13 +32,13 @@ function SearchBar() {
       );
 
       if (!targetFolder) {
-        console.log("Folder not found:", type);
+     
         return;
       }
 
       store.pickerMode = "asset";
 
-      console.log("SEARCH START");
+     
       const mode = type === "template" ? "template" : "asset";
 
       await loadFolderImages(targetFolder, mode);
@@ -49,12 +49,10 @@ function SearchBar() {
         size: dialogSize,
       });
 
-      console.log("DIALOG OPEN");
+   
       setSearch("");
       if (mode === "template") {
-        console.log("RESULTS:", store.templateResults.length);
       } else {
-        console.log("RESULTS:", store.assetResults.length);
       }
     } catch (err) {
       console.log("SEARCH ERROR:", err);
@@ -62,7 +60,7 @@ function SearchBar() {
   }
 
   function handleKeyDown(event) {
-    console.log(event.key);
+   
     if (event.key == "Enter") {
       handleSearch();
     }

@@ -63,7 +63,6 @@ async function scanFolderRecursive(folder, view) {
     if (validFiles.length > 0 && !thumbCacheFolder) {
       thumbCacheFolder = await folder.createFolder(".thumb_cache");
 
-      console.log("created .thumb_cache", folder.nativePath);
     }
 
     // =====================

@@ -14,11 +14,10 @@ async function handleConvert() {
   const current = store.currentAlbumSize;
   const target = store.albumSize;
 
-  console.log("CURRENT :", current);
-  console.log("TARGET  :", target);
+
 
   if (!target) {
-    console.log("NO TARGET");
+
     return;
   }
 
@@ -41,12 +40,11 @@ async function handleConvert() {
   }
 
   if (!targetWidth || !targetHeight) {
-    console.log("INVALID TARGET");
+
     return;
   }
 
   if (currentWidth === targetWidth && currentHeight === targetHeight) {
-    console.log("ALREADY SAME SIZE IN PX");
     return;
   }
 
@@ -60,11 +58,6 @@ async function handleConvert() {
   // Single axis correction (X only) to regain original ratio
   const scaleX = (heightScale / widthScale) * 100;
   const scaleY = 100; 
-
-  console.log("WIDTH SCALE:", widthScale);
-  console.log("HEIGHT SCALE:", heightScale);
-  console.log("FINAL SCALE X:", scaleX);
-  console.log("FINAL SCALE Y:", scaleY);
 
   await core.executeAsModal(
     async () => {
@@ -92,8 +85,6 @@ async function handleConvert() {
         }
       );
 
-      console.log("DOCUMENT RESIZED");
-
       // ===========================
       // FIND TEC__ LAYERS
       // ===========================
@@ -104,17 +95,15 @@ async function handleConvert() {
         (layer) => layer.name && layer.name.startsWith("TEC__")
       );
 
-      console.log("TEC__ LAYERS FOUND:", tscLayers.length);
+      
 
      // ===========================
       // FIX DISTORTION (ROCK SOLID BATCHPLAY)
       // ===========================
 
-      console.log("STARTING TRANSFORM LOOP");
       const start = Date.now();
 
       for (const layer of tscLayers) {
-        console.log("FIXING:", layer.name, "ID:", layer.id);
 
         // 1. Force Select Layer via batchPlay (Bulletproof selection)
         await action.batchPlay(
@@ -167,9 +156,6 @@ async function handleConvert() {
         );
       }
 
-      console.log("TRANSFORM LOOP DONE");
-      console.log("TIME(ms):", Date.now() - start);
-      console.log("CONVERSION COMPLETE");
     },
     {
       commandName: "Album Convert",

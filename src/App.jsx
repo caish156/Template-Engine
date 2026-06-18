@@ -17,7 +17,7 @@ function App() {
   const [fillMode, setFillMode] = React.useState(false);
   window.store = store;
 
-  console.log(store);
+
   return (
     <div className="panel">
       <div className="allRow">

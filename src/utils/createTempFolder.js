@@ -18,7 +18,6 @@ async function createTempFolder() {
 
     store.thumbCachePath = thumbFolder.nativePath;
 
-    console.log("TEMP CACHE READY");
   } catch (err) {
     console.log(err);
   }
