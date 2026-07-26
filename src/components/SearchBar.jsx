@@ -1,8 +1,5 @@
 const React = require("react");
-
 const { openDialog } = require("./openDialog");
-
-const ImageResultsView = require("./ImageResultsView.jsx");
 const { loadFolderImages } = require("../utils/loadFolderImages");
 const { store } = require("../store/store");
 
@@ -17,7 +14,7 @@ function SearchBar() {
 
       store.searchKey = search.trim().toLowerCase();
 
-      const assetRoot = store.settings.assetFolder;
+      const assetRoot = store.assetFolder;
 
       if (!assetRoot) {
     

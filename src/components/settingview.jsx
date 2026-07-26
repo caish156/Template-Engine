@@ -6,7 +6,7 @@ const fs = uxp.storage.localFileSystem;
 
 const { store } = require("../store/store");
 const { loadFolderImages } = require("../utils/loadFolderImages");
-const { setClipartPath, setTemplatePath } = require("../utils/setting");
+const { setClipartPath, setTemplatePath, setAssetPath } = require("../utils/setting");
 
 function SettingsView() {
   async function selectAssetFolder() {
@@ -14,7 +14,7 @@ function SettingsView() {
 
     if (!folder) return;
 
-    store.settings.assetFolder = folder;
+    await setAssetPath(folder);
 
     closeDialog();
   }
@@ -27,6 +27,7 @@ function SettingsView() {
     }
   }
   function clearDir() {
+    store.assetFolder = null;
     store.settings.assetFolder = null;
   }
   return (

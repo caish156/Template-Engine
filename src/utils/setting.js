@@ -16,6 +16,8 @@ const defaultSettings = {
   templateFolder: "",
 
   clipartFolder: "",
+
+  assetFolder: "",
 };
 
 // ======================
@@ -45,12 +47,13 @@ async function saveSettings() {
     templateFolder: store.settings.templateFolder,
 
     clipartFolder: store.settings.clipartFolder,
+
+    assetFolder: store.settings.assetFolder,
   };
 
   await file.write(JSON.stringify(settingsData, null, 2), {
     format: formats.utf8,
   });
-
 }
 
 // ======================
@@ -117,6 +120,24 @@ async function loadSettings() {
       }
     }
 
+    // ======================
+    // RESTORE ASSET
+    // ======================
+
+    if (store.settings.assetFolder) {
+      try {
+        const folder = await fs.getEntryForPersistentToken(
+          store.settings.assetFolder,
+        );
+
+        store.assetFolder = folder;
+
+        console.log("ASSET RESTORED:", folder.nativePath);
+      } catch (error) {
+        console.log("ASSET RESTORE FAILED");
+      }
+    }
+
     console.log("SETTINGS LOADED:", store.settings);
   } catch (error) {
     console.log("SETTINGS LOAD ERROR", error);
@@ -163,6 +184,24 @@ async function setClipartPath(folder) {
   await saveSettings();
 }
 
+// ======================
+// ASSET
+// ======================
+
+async function setAssetPath(folder) {
+  const token = await fs.createPersistentToken(folder);
+
+  // RUNTIME OBJECT
+
+  store.assetFolder = folder;
+
+  // SAVE TOKEN
+
+  store.settings.assetFolder = token;
+
+  await saveSettings();
+}
+
 module.exports = {
   loadSettings,
 
@@ -171,4 +210,6 @@ module.exports = {
   setTemplatePath,
 
   setClipartPath,
+
+  setAssetPath,
 };

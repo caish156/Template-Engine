@@ -6,6 +6,8 @@ jspm_packages/
 dist/
 build/
 out/
+bundle.js
++bundle.js.LICENSE.txt
 
 # Logs
 *.log

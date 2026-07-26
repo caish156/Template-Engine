@@ -111,9 +111,10 @@ async function scanFolderRecursive(folder, view) {
       }
       const searchKey = (store.searchKey || "").trim().toLowerCase();
 
-      if (searchKey && !entry.name.toLowerCase().includes(searchKey)) {
-        continue;
-      }
+
+if (searchKey && !orderedMatch(entry.name, searchKey)) {
+  continue;
+}
       // =====================
       // NO CACHE
       // =====================
@@ -199,7 +200,20 @@ async function scanFolderRecursive(folder, view) {
     console.log("scanFolderRecursive error", folder.nativePath, err);
   }
 }
+function orderedMatch(text, search) {
+  text = text.toLowerCase();
+  search = search.toLowerCase();
 
+  let j = 0;
+
+  for (let i = 0; i < text.length && j < search.length; i++) {
+    if (text[i] === search[j]) {
+      j++;
+    }
+  }
+
+  return j === search.length;
+}
 module.exports = {
   loadFolderImages,
 };
